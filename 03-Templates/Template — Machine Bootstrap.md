@@ -91,7 +91,11 @@ brew install \
   atuin \
   lazydocker \
   tldr \
-  btop
+  btop \
+  yazi \
+  hyperfine \
+  dust \
+  dive
 
 # ============================================
 # 5. Version Manager (mise)
@@ -185,7 +189,7 @@ source <(fzf --zsh)
 # atuin (shell history)
 eval "$(atuin init zsh)"
 
-# Modern aliases
+# Modern aliases — essentials
 alias cat="bat"
 alias ls="eza --icons"
 alias ll="eza -l --git --icons"
@@ -196,9 +200,28 @@ alias find="fd"
 alias lg="lazygit"
 alias lzd="lazydocker"
 alias top="btop"
+alias du="dust"
 
 # fzf preview
 alias preview="fzf --preview 'bat --color=always {}'"
+
+# httpie shortcuts for local dev
+alias api="http localhost:3000/api"
+alias apih="http localhost:3000/api/health"
+
+# jq shortcuts
+alias json="jq ."
+alias jsonkeys="jq 'keys'"
+
+# yazi — cd into the directory you were browsing when you quit
+function y() {
+  local tmp="\$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "\$@" --cwd-file="\$tmp"
+  if cwd="\$(command cat -- "\$tmp")" && [ -n "\$cwd" ] && [ "\$cwd" != "\$PWD" ]; then
+    builtin cd -- "\$cwd"
+  fi
+  rm -f -- "\$tmp"
+}
 
 # Quick project navigation
 alias dev="cd ~/dev"
