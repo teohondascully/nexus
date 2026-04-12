@@ -10,11 +10,11 @@ You are maintaining a developer knowledge vault in Obsidian. Your job is to keep
 
 ## Your Tasks
 
-### 1. Audit Tools MOC and Beyond the Basics
+### 1. Audit Tools and Beyond the Basics
 - Check if any recommended tools have been deprecated, acquired, or superseded
 - Verify pricing is still accurate (especially Claude plans, Vercel, Stripe, etc.)
 - Check if any new tools have become the clear best-in-class for a category
-- Update the Stack Directory table in Tools MOC
+- Update the Stack Directory table in Tools
 - Check if the "What NOT to Use" list in Beyond the Basics is still accurate
 
 ### 2. Audit Version and Runtime Management
@@ -38,7 +38,7 @@ You are maintaining a developer knowledge vault in Obsidian. Your job is to keep
 - Search for recent AI coding tool releases or major updates
 - Search for new frameworks or meta-shifts in the JS/TS ecosystem
 - Search for new developer productivity tools
-- Add findings to the Signal Log in Signals MOC with today's date
+- Add findings to the Signal Log in Signals with today's date
 
 ### 6. Update Changelog
 After all updates, append a new entry to CHANGELOG.md with:
@@ -56,3 +56,10 @@ After all updates, append a new entry to CHANGELOG.md with:
 - When searching the web, use short specific queries (1-6 words)
 - Cross-reference multiple sources before updating a recommendation
 - If a tool has been deprecated, note both the deprecation AND the recommended replacement
+- Always create pull requests — never commit directly to main
+
+## Stack vs. Landscape Policy
+- **Stack Directory** (Tools table) = what we actually build with. Do NOT change picks or runner-ups without explicit approval. Only update version numbers.
+- **AI Coding Tool notes**, **Beyond the Basics**, **Tool Comparison Matrix** = landscape documentation. Update freely with new features, pricing, and status changes. This is tracking, not recommending.
+- **New tool worth considering for our stack?** Add a `<!-- REVIEW: [tool] may be worth adding to stack for [reason] -->` comment. Do not add it to the Stack Directory.
+- **Tool in our stack deprecated?** Flag with `<!-- REVIEW: [tool] deprecated, consider [replacement] -->`. Do not swap it out.

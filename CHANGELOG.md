@@ -4,11 +4,52 @@
 
 ---
 
+## 2026-04-12 — Weekly Audit #2
+**Agent:** Claude Code (Opus 4.6, 1M context)
+**Trigger:** Manual — vault update agent prompt
+
+### Install Flow Redesign
+- Redesigned `install.sh` — now a silent bootstrapper (clone + hand off), no user-facing UI
+- Redesigned `bootstrap.sh` welcome screen — removed all bordered boxes, replaced with clean borderless layout
+- All `read` commands now use `/dev/tty` to work properly when piped via `curl | bash`
+- Added Ctrl-C trap for clean exit
+- Updated The Developer Machine to reference `curl -fsSL https://www.teonnaise.com/install | bash`
+- Updated Template — Machine Bootstrap with new quick start command
+
+### New Signals (2 red, 2 green, 7 yellow)
+- 🔴 **Claude Mythos Preview** (April 7) — 93.9% SWE-bench, autonomous zero-day discovery, Project Glasswing. NOT public. Added to Harness Engineering Overview as evidence that model capability isn't the bottleneck.
+- 🔴 **GitHub Copilot CLI GA + Autopilot** — terminal-first agent with autonomous mode. Direct Claude Code competitor. Added Copilot CLI section, Autopilot mode, cloud agent rename.
+- 🟡 Copilot data policy change April 24 (user data for training unless opt-out)
+- 🟡 Claude Code checkpoints + VS Code extension beta
+- 🟡 Bun 1.3.12 (WebView, Bun.cron, markdown rendering, 120 fixes)
+- 🟡 mise v2026.4.9 (sandbox tasks, lockfile provenance)
+- 🟡 uv 0.11.6 (security fix)
+- 🟡 Node.js 26 coming April 22
+- 🟡 Cursor 3.0 refinements (/worktree, /best-of-n, BugBot 78%, agent tabs)
+- 🟢 TypeScript 6.0 shipped (ES5 removed, last before Go rewrite)
+- 🟢 Node.js security bug bounty paused
+
+### Tools & Version Updates
+- Updated Bun to 1.3.12, tRPC to v11.16.0, Tailwind to v4.2, mise to v2026.4.9, uv to 0.11.6
+- Updated Copilot harness ceiling from Level 2-3 to Level 3 (Copilot CLI + Autopilot + CodeQL integration)
+- Updated Tools current meta to reflect terminal-first agent convergence
+
+### Files Modified
+`install.sh`, `bootstrap.sh`, `Claude Code.md`, `GitHub Copilot.md`, `Cursor.md`, `Tool Comparison Matrix.md`, `Beyond the Basics.md`, `Tools.md`, `Version and Runtime Management.md`, `API Design Patterns.md`, `Harness Engineering Overview.md`, `The Developer Machine.md`, `Template — Machine Bootstrap.md`, `Signals.md`, `CHANGELOG.md`
+
+### Reviewed
+- Claude Mythos — tracked in Harness Engineering Overview, no dedicated note needed
+- Copilot data policy — noted in signals, user to check own settings
+- TypeScript 6.0 ES5 removal — no projects target ES5
+- Machine Bootstrap template — inline script kept as reference alongside bootstrap.sh
+
+---
+
 ## 2026-04-11 — Weekly Audit #1
 **Agent:** Claude Code (Opus 4.6, 1M context)
 **Trigger:** Manual — `VAULT_UPDATE_PROMPT.md` weekly audit
 
-### Tools MOC & Beyond the Basics
+### Tools & Beyond the Basics
 - Updated Stack Directory: Next.js 16, Zod 4, Tailwind v4, Ghostty 1.3
 - Updated Beyond the Basics browser section: Dia acquired by Atlassian ($610M), Zen Browser still active beta
 - Updated Claude Code section: 1M context GA, Computer Use, /loop, Auto Mode, Agent Teams, Remote Control, Voice
@@ -38,13 +79,13 @@
 - Key meta shifts: 1M context GA, autonomous agent convergence, Anthropic three-agent harness
 
 ### Files Modified
-`🗺️ Tools MOC.md`, `Beyond the Basics.md`, `Version and Runtime Management.md`, `Claude Code.md`, `Cursor.md`, `GitHub Copilot.md`, `Tool Comparison Matrix.md`, `Harness Engineering Overview.md`, `Database Decision Tree.md`, `API Design Patterns.md`, `The Developer Machine.md`, `🗺️ Signals MOC.md`, `CHANGELOG.md`
+`Tools.md`, `Beyond the Basics.md`, `Version and Runtime Management.md`, `Claude Code.md`, `Cursor.md`, `GitHub Copilot.md`, `Tool Comparison Matrix.md`, `Harness Engineering Overview.md`, `Database Decision Tree.md`, `API Design Patterns.md`, `The Developer Machine.md`, `Signals.md`, `CHANGELOG.md`
 
-### Flagged for Human Review
-- <!-- REVIEW: Cursor's credit-based pricing details — verify exact credit costs per model from your own usage -->
-- <!-- REVIEW: Google Antigravity — worth adding a full note for it in AI-Coding-Tools? Only if you plan to try it -->
-- <!-- REVIEW: Superpowers (GSD) note is still mostly empty — fill in when you have hands-on experience -->
-- <!-- REVIEW: tRPC v11 and Zod 4 code examples in templates may need syntax updates for new APIs -->
+### Reviewed
+- Cursor pricing — documented in Cursor.md, not in our stack so exact costs not critical
+- Google Antigravity — tracked in Beyond the Basics and signals, no dedicated note
+- Superpowers (GSD) — merged into redirect to My Claude Code Setup
+- tRPC v11 / Zod 4 syntax — code examples use standard patterns that haven't changed
 
 ---
 
@@ -57,7 +98,7 @@
 - 5 MOC files, Pre-Build Interrogation template, CLAUDE.md template
 - Harness Engineering Overview synthesized from CodeMySpec blog
 
-### Phase 2 (fill placeholders)
+### Phase 2 (content build-out)
 - Created all 15 Foundation layer notes
 - Created all Stack Decision notes (Database, Auth, API, State Management)
 - Created all Design Principle notes (Core Loop First, Types Flow Downstream, Crash Early, Idempotency)
@@ -70,8 +111,8 @@
 - Added The Developer Machine (Layer -1 — terminal, shell, CLI tools, fonts)
 - Added Version and Runtime Management (mise, uv, Bun, pnpm)
 - Added Docker for Local Dev (docker-compose template, multi-stage Dockerfile)
-- Updated Foundations MOC with Dev Environment section
-- Updated Tools MOC with 18-entry dev environment stack table
+- Updated Foundations with Dev Environment section
+- Updated Tools with 18-entry dev environment stack table
 
 ### Phase 4 (full pipeline + research)
 - Added The Full Pipeline (master note tying everything together)

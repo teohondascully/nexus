@@ -1,3 +1,26 @@
+# Template — Machine Bootstrap
+
+> One command. Fresh Mac to fully operational dev environment. Safe to re-run. Interactive. Last updated: **2026-04-12**.
+
+---
+
+## Quick Start
+
+```bash
+curl -fsSL https://www.teonnaise.com/install | bash
+```
+
+This silently clones the nexus repo to `~/.nexus`, then launches the interactive bootstrap below. Nothing installs until you press Enter.
+
+The install script lives at `install.sh` in the repo root. The bootstrap script is `bootstrap.sh`.
+
+---
+
+## The Bootstrap Script
+
+The full source is in `bootstrap.sh` at the repo root. Key design decisions:
+
+```bash
 #!/bin/bash
 # ================================================================
 # Machine Bootstrap — Interactive Dev Environment Setup
@@ -6,7 +29,6 @@
 # Reference: https://github.com/teohondascully/nexus
 # ================================================================
 set -e
-trap 'echo ""; echo "Cancelled."; exit 1' INT
 
 # ── Colors & Helpers ─────────────────────────────────────────────
 RED='\033[0;31m'
@@ -88,8 +110,7 @@ ask() {
   echo ""
   echo -e "${CYAN}?${NC} $1"
   echo -e "  ${DIM}$2${NC}"
-  printf "  Install? [Y/n] "
-  read -n 1 -r REPLY < /dev/tty
+  read -p "  Install? [Y/n] " -n 1 -r
   echo ""
   [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]
 }
@@ -97,90 +118,110 @@ ask() {
 # ── Audit Table ──────────────────────────────────────────────────
 show_audit() {
   echo ""
-  echo -e "  ${BOLD}Tools${NC}"
+  echo -e "${BOLD}Full audit of everything this script installs:${NC}"
   echo ""
-  echo -e "  ${CYAN}xcode-select${NC}        git, clang, make"
-  echo -e "  ${CYAN}homebrew${NC}            macOS package manager"
+  echo -e "${BOLD}┌────────────────────┬──────────────────────┬────────────────────────────────────────────┬──────────┐${NC}"
+  echo -e "${BOLD}│ Tool               │ Source               │ What it does                               │ Required │${NC}"
+  echo -e "${BOLD}├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤${NC}"
+  echo -e "│ ${CYAN}xcode-select${NC}      │ Apple                │ git, clang, make — needed by everything    │ yes      │"
+  echo -e "│ ${CYAN}homebrew${NC}          │ brew.sh              │ macOS package manager                      │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}ghostty${NC}           │ ghostty.org          │ GPU-accelerated terminal (Zig)             │ yes      │"
+  echo -e "│ ${CYAN}starship${NC}          │ starship.rs          │ Fast shell prompt (Rust)                   │ yes      │"
+  echo -e "│ ${CYAN}JetBrains Mono${NC}    │ Nerd Fonts           │ Monospace font with ligatures + icons      │ yes      │"
+  echo -e "│ ${CYAN}zsh-autosuggest${NC}   │ brew (zsh plugin)    │ Ghost text suggestions as you type         │ yes      │"
+  echo -e "│ ${CYAN}zsh-syntax-hl${NC}     │ brew (zsh plugin)    │ Colors commands green/red as you type      │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}ripgrep${NC}           │ github/BurntSushi    │ grep replacement, 100x faster              │ yes      │"
+  echo -e "│ ${CYAN}bat${NC}               │ github/sharkdp       │ cat with syntax highlighting               │ yes      │"
+  echo -e "│ ${CYAN}eza${NC}               │ github/eza-community │ ls with icons, git status, tree            │ yes      │"
+  echo -e "│ ${CYAN}fd${NC}                │ github/sharkdp       │ find replacement, simpler + faster          │ yes      │"
+  echo -e "│ ${CYAN}zoxide${NC}            │ github/ajeetdsouza   │ Smart cd — learns your directories         │ yes      │"
+  echo -e "│ ${CYAN}fzf${NC}               │ github/junegunn      │ Fuzzy finder for files, history, branches  │ yes      │"
+  echo -e "│ ${CYAN}git-delta${NC}         │ github/dandavison     │ Beautiful syntax-highlighted git diffs      │ yes      │"
+  echo -e "│ ${CYAN}lazygit${NC}           │ github/jesseduffield  │ Terminal UI for git                        │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}atuin${NC}             │ atuin.sh             │ Shell history search, syncs across machines │ yes      │"
+  echo -e "│ ${CYAN}httpie${NC}            │ httpie.io            │ Human-friendly HTTP client                 │ yes      │"
+  echo -e "│ ${CYAN}jq${NC}               │ jqlang.github.io     │ Command-line JSON processor                │ yes      │"
+  echo -e "│ ${CYAN}yazi${NC}              │ github/sxyazi        │ Terminal file manager with preview          │ yes      │"
+  echo -e "│ ${CYAN}hyperfine${NC}         │ github/sharkdp       │ CLI benchmarking tool                      │ yes      │"
+  echo -e "│ ${CYAN}lazydocker${NC}        │ github/jesseduffield  │ Terminal UI for Docker                     │ yes      │"
+  echo -e "│ ${CYAN}tldr${NC}              │ tldr.sh              │ Simplified man pages with examples         │ yes      │"
+  echo -e "│ ${CYAN}btop${NC}              │ github/aristocratos   │ System monitor (CPU, mem, disk, network)   │ yes      │"
+  echo -e "│ ${CYAN}dust${NC}              │ github/bootandy      │ Disk usage analyzer                        │ yes      │"
+  echo -e "│ ${CYAN}dive${NC}              │ github/wagoodman      │ Docker image layer inspector               │ yes      │"
+  echo -e "│ ${CYAN}gh${NC}                │ cli.github.com       │ GitHub CLI — PRs, issues, CI from terminal │ yes      │"
+  echo -e "│ ${CYAN}just${NC}              │ github/casey          │ Modern command runner (replaces make)       │ yes      │"
+  echo -e "│ ${CYAN}raycast${NC}           │ raycast.com          │ App launcher, clipboard, window management  │ ${YELLOW}asks${NC}     │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}mise${NC}              │ mise.jdx.dev         │ Version manager (replaces nvm/pyenv/rbenv) │ yes      │"
+  echo -e "│ ${CYAN}node 24 LTS${NC}       │ nodejs.org (via mise)│ JavaScript runtime                         │ yes      │"
+  echo -e "│ ${CYAN}pnpm${NC}              │ pnpm.io              │ Fast, strict JS package manager             │ yes      │"
+  echo -e "│ ${CYAN}bun${NC}               │ bun.sh               │ Fast JS runtime + bundler + test runner     │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}python 3.12${NC}       │ python.org (via mise)│ Python runtime                             │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}uv${NC}                │ astral.sh            │ Fast Python package manager (Rust)          │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}ruff${NC}              │ astral.sh            │ Fast Python linter (Rust)                   │ ${YELLOW}asks${NC}     │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}docker${NC}            │ docker.com           │ Containerization platform                  │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}claude-code${NC}       │ anthropic (via npm)  │ CLI AI coding agent                        │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}nexus CLI${NC}         │ this repo            │ Session launcher — assembles prompts        │ yes      │"
+  echo -e "${BOLD}└────────────────────┴──────────────────────┴────────────────────────────────────────────┴──────────┘${NC}"
   echo ""
-  echo -e "  ${CYAN}ghostty${NC}             GPU-accelerated terminal"
-  echo -e "  ${CYAN}starship${NC}            fast shell prompt"
-  echo -e "  ${CYAN}JetBrains Mono${NC}      monospace font + icons"
-  echo -e "  ${CYAN}zsh-autosuggestions${NC} ghost text from history"
-  echo -e "  ${CYAN}zsh-syntax-hl${NC}       colors commands as you type"
+  echo -e "${BOLD}Configs written${NC} ${DIM}(only if file doesn't already exist)${NC}${BOLD}:${NC}"
   echo ""
-  echo -e "  ${CYAN}ripgrep${NC}             grep, 100x faster"
-  echo -e "  ${CYAN}bat${NC}                 cat + syntax highlighting"
-  echo -e "  ${CYAN}eza${NC}                 ls + icons, git status, tree"
-  echo -e "  ${CYAN}fd${NC}                  find, simpler + faster"
-  echo -e "  ${CYAN}zoxide${NC}              smart cd"
-  echo -e "  ${CYAN}fzf${NC}                 fuzzy finder"
-  echo -e "  ${CYAN}git-delta${NC}           syntax-highlighted diffs"
-  echo -e "  ${CYAN}lazygit${NC}             terminal git UI"
+  echo -e "  ${CYAN}~/.config/ghostty/config${NC}          Terminal: Catppuccin theme, splits, transparency"
+  echo -e "  ${CYAN}~/.config/ghostty/themes/${NC}         Catppuccin Mocha (downloaded from GitHub)"
+  echo -e "  ${CYAN}~/.config/starship.toml${NC}           Prompt: minimal, gcloud/aws disabled"
+  echo -e "  ${CYAN}~/.config/mise/config.toml${NC}        Versions: node@24, python@3.12, auto_install"
+  echo -e "  ${CYAN}~/.gitconfig${NC}                      Git: delta pager, rebase, rerere, side-by-side"
+  echo -e "  ${CYAN}~/.zshrc${NC} ${DIM}(appended)${NC}              Aliases, tool integrations, yazi function"
   echo ""
-  echo -e "  ${CYAN}atuin${NC}               shell history search"
-  echo -e "  ${CYAN}httpie${NC}              HTTP client"
-  echo -e "  ${CYAN}jq${NC}                  JSON processor"
-  echo -e "  ${CYAN}yazi${NC}                terminal file manager"
-  echo -e "  ${CYAN}hyperfine${NC}           CLI benchmarking"
-  echo -e "  ${CYAN}lazydocker${NC}          terminal Docker UI"
-  echo -e "  ${CYAN}tldr${NC}                simplified man pages"
-  echo -e "  ${CYAN}btop${NC}                system monitor"
-  echo -e "  ${CYAN}dust${NC}                disk usage analyzer"
-  echo -e "  ${CYAN}dive${NC}                Docker image inspector"
-  echo -e "  ${CYAN}gh${NC}                  GitHub CLI"
-  echo -e "  ${CYAN}just${NC}                command runner"
-  echo -e "  ${CYAN}raycast${NC}             app launcher                  ${YELLOW}asks${NC}"
+  echo -e "${BOLD}Nothing is installed without your knowledge.${NC}"
+  echo -e "Items marked ${YELLOW}asks${NC} will prompt you before installing."
+  echo -e "Already-installed tools are skipped automatically."
   echo ""
-  echo -e "  ${CYAN}mise${NC}                version manager"
-  echo -e "  ${CYAN}node 24${NC}             JS runtime"
-  echo -e "  ${CYAN}pnpm${NC}               package manager"
-  echo -e "  ${CYAN}bun${NC}                 fast JS runtime               ${YELLOW}asks${NC}"
-  echo -e "  ${CYAN}python 3.12${NC}         Python runtime                ${YELLOW}asks${NC}"
-  echo -e "  ${CYAN}uv${NC}                  Python package manager        ${YELLOW}asks${NC}"
-  echo -e "  ${CYAN}ruff${NC}                Python linter                 ${YELLOW}asks${NC}"
-  echo ""
-  echo -e "  ${CYAN}docker${NC}              containerization              ${YELLOW}asks${NC}"
-  echo -e "  ${CYAN}claude-code${NC}         CLI AI agent"
-  echo -e "  ${CYAN}nexus${NC}               session launcher"
-  echo ""
-  echo -e "  ${BOLD}Configs${NC} ${DIM}(only written if file doesn't exist)${NC}"
-  echo ""
-  echo -e "  ${CYAN}~/.config/ghostty/config${NC}      Catppuccin theme, splits, transparency"
-  echo -e "  ${CYAN}~/.config/starship.toml${NC}       minimal prompt"
-  echo -e "  ${CYAN}~/.config/mise/config.toml${NC}    node@24, python@3.12"
-  echo -e "  ${CYAN}~/.gitconfig${NC}                  delta, rebase, rerere"
-  echo -e "  ${CYAN}~/.zshrc${NC} ${DIM}(appended)${NC}          aliases, integrations"
-  echo ""
-  echo -e "  Items marked ${YELLOW}asks${NC} prompt before installing."
-  echo -e "  Already-installed tools are skipped."
+  echo -e "${DIM}Source code: https://github.com/teohondascully/nexus/blob/main/bootstrap.sh${NC}"
   echo ""
 }
 
 # ── Welcome ──────────────────────────────────────────────────────
 clear
 echo ""
-echo -e "  ${BOLD}nexus bootstrap${NC}"
+echo -e "${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║           Machine Bootstrap — Dev Environment            ║${NC}"
+echo -e "${BOLD}║              Last approved by Teo: 2026-04-11            ║${NC}"
+echo -e "${BOLD}╠══════════════════════════════════════════════════════════╣${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  This script sets up a complete dev environment:          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    1.  Xcode CLI Tools     ${DIM}(git, compilers)${NC}              ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    2.  Homebrew             ${DIM}(package manager)${NC}             ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    3.  Ghostty + config     ${DIM}(terminal emulator)${NC}           ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    4.  Modern CLI tools     ${DIM}(ripgrep, bat, eza, etc.)${NC}     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    5.  Advanced CLI tools   ${DIM}(httpie, yazi, btop, etc.)${NC}    ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    6.  mise                 ${DIM}(version manager)${NC}             ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    7.  Node + pnpm + Bun    ${DIM}(JS runtimes & packages)${NC}     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    8.  Python + uv + Ruff   ${DIM}(Python toolchain)${NC}           ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    9.  Docker Desktop       ${DIM}(containerization)${NC}            ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   10.  Claude Code          ${DIM}(CLI AI agent)${NC}                ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   11.  Git config           ${DIM}(delta, rebase, rerere)${NC}       ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   12.  Shell config         ${DIM}(aliases, prompt, tools)${NC}      ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  ${GREEN}Safe to re-run — skips anything already installed.${NC}      ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  ${YELLOW}Optional steps will ask before installing.${NC}              ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "  12 steps. Skips anything already installed."
-echo -e "  Optional steps ask before installing."
-echo ""
-echo -e "   ${BOLD} 1${NC}  Xcode CLI Tools     ${BOLD} 7${NC}  Node + pnpm + Bun"
-echo -e "   ${BOLD} 2${NC}  Homebrew             ${BOLD} 8${NC}  Python + uv + Ruff"
-echo -e "   ${BOLD} 3${NC}  Ghostty + config     ${BOLD} 9${NC}  Docker Desktop"
-echo -e "   ${BOLD} 4${NC}  Modern CLI tools     ${BOLD}10${NC}  Claude Code"
-echo -e "   ${BOLD} 5${NC}  Advanced CLI tools   ${BOLD}11${NC}  Git config"
-echo -e "   ${BOLD} 6${NC}  mise                 ${BOLD}12${NC}  Shell config"
-echo ""
-echo -e "  ${GREEN}Safe to re-run.${NC} ${DIM}github.com/teohondascully/nexus${NC}"
-echo ""
-printf "  Enter to start · i to inspect · Ctrl-C to cancel "
-read -n 1 -r REPLY < /dev/tty
+echo -e "  Press ${BOLD}Enter${NC} to start    ${DIM}│${NC}    Press ${BOLD}i${NC} to inspect everything first"
+read -n 1 -r
 echo ""
 
 if [[ $REPLY == "i" || $REPLY == "I" ]]; then
   show_audit
-  printf "  Enter to start · Ctrl-C to cancel "
-  read -r _ < /dev/tty
+  echo -e "  Press ${BOLD}Enter${NC} to continue with install    ${DIM}│${NC}    ${BOLD}Ctrl+C${NC} to cancel"
+  read -r
 fi
 
 # ═════════════════════════════════════════════════════════════════
@@ -194,8 +235,7 @@ else
   echo "  Installing Xcode CLI tools (this opens a system dialog)..."
   xcode-select --install
   echo ""
-  printf "  Press Enter after the Xcode installer finishes..."
-  read -r _ < /dev/tty
+  read -p "  Press Enter after the Xcode installer finishes..."
   installed "xcode-select" "compilers, git, make"
 fi
 
@@ -456,13 +496,11 @@ installed "git config" "delta pager, rebase, rerere"
 # Only prompt for identity if not already set
 if [ -z "$(git config --global user.name)" ]; then
   echo ""
-  printf "  Git name (for commits): "
-  read -r git_name < /dev/tty
+  read -p "  Git name (for commits): " git_name
   git config --global user.name "$git_name"
 fi
 if [ -z "$(git config --global user.email)" ]; then
-  printf "  Git email (for commits): "
-  read -r git_email < /dev/tty
+  read -p "  Git email (for commits): " git_email
   git config --global user.email "$git_email"
 fi
 
@@ -580,7 +618,9 @@ fi
 # ═════════════════════════════════════════════════════════════════
 echo ""
 echo ""
-echo -e "  ${BOLD}Setup complete${NC}"
+echo -e "${BOLD}╔════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║                    Setup Complete                     ║${NC}"
+echo -e "${BOLD}╚════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
 if [ ${#INSTALLED[@]} -gt 0 ]; then
@@ -629,3 +669,46 @@ echo -e "  ${CYAN}Launcher${NC}   nexus            ${CYAN}Tasks${NC}       just"
 echo ""
 echo -e "${DIM}Last approved by Teo: 2026-04-11 | Reference: The Developer Machine note${NC}"
 echo ""
+```
+
+---
+
+## After Bootstrap
+
+1. **Restart terminal** — `source ~/.zshrc` or just close and reopen
+2. **Verify:**
+   ```bash
+   node --version && pnpm --version && bun --version && uv --version && python3 --version && docker --version
+   ```
+3. **Open Docker Desktop** — first launch needs a manual start to finish setup
+4. **Set up Claude Code:** run `claude` and follow the API key flow
+5. **Start your first project** using [[Template — Monorepo Scaffold]]
+
+## Re-Running the Script
+
+The script is **fully idempotent** — safe to run again at any time:
+
+- Already-installed tools are skipped (shows "already installed")
+- Config files are only written if they don't exist yet
+- Shell config uses a marker comment to avoid duplicating the block
+- Optional tools (Bun, Python, Docker, Cursor) ask before installing
+- The summary at the end shows exactly what was installed, skipped, or failed
+
+Run it after a system update, after restoring from backup, or just to verify everything is in place.
+
+## Maintaining Your Setup
+
+- **Store this script** in your dotfiles repo alongside your config files
+- **Update the date** at the top when you change tool versions or add new tools
+- **Audit quarterly** during your [[Template — Weekly Tools Review|weekly tools review]]
+
+---
+
+## Related
+- [[The Developer Machine]] — rationale behind each tool choice
+- [[Version and Runtime Management]] — deep dive on mise, uv, Bun
+- [[Template — Monorepo Scaffold]] — next step after machine setup
+
+---
+
+#templates #machine-setup #bootstrap

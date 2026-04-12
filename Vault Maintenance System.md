@@ -6,7 +6,7 @@
 
 ## The Problem
 
-Knowledge decays. Tools get replaced, patterns evolve, new research drops. A vault that isn't updated is a vault that misleads. But manually updating 46+ notes is unsustainable.
+Knowledge decays. Tools get replaced, patterns evolve, new research drops. A vault that isn't updated is a vault that misleads. But manually updating 50+ notes is unsustainable.
 
 ## The Solution: Agent-Driven Updates
 
@@ -19,7 +19,7 @@ Use Claude Code to periodically audit and update the vault, with a changelog so 
 ### 1. Add the vault to a git repo
 
 ```bash
-cd ~/obsidian-vault  # or wherever you keep it
+cd ~/.nexus  # or wherever your vault is cloned  # or wherever you keep it
 git init
 git add -A
 git commit -m "initial vault state"
@@ -44,11 +44,11 @@ keep all notes accurate, current, and useful.
 
 ## Your Tasks
 
-### 1. Audit Tools MOC
+### 1. Audit Tools
 - Check if any recommended tools have been deprecated, acquired, or superseded
 - Verify pricing is still accurate (especially Claude plans, Vercel, etc.)
 - Check if any new tools have become the clear best-in-class for a category
-- Update the Stack Directory table in Tools MOC
+- Update the Stack Directory table in Tools
 
 ### 2. Audit Foundations Notes
 - Check if any architectural patterns have evolved
@@ -58,7 +58,7 @@ keep all notes accurate, current, and useful.
 ### 3. Check for New Signals
 - Search for recent AI coding tool releases or major updates
 - Search for new frameworks or meta-shifts in the JS/TS ecosystem
-- Add findings to the Signal Log in Signals MOC with date
+- Add findings to the Signal Log in Signals with date
 
 ### 4. Update Changelog
 - After all updates, append to CHANGELOG.md with:
@@ -94,7 +94,7 @@ Save as `CHANGELOG.md` in your vault root:
 - [file]: [what changed and why]
 
 ### New Signals
-- [signal description] → classified as 🔴/🟡/🟢
+- [signal description] → classified as [red]/[yellow]/[green]
 
 ### Review Needed
 - [ ] [anything the agent flagged for human review]
@@ -110,7 +110,7 @@ Save as `CHANGELOG.md` in your vault root:
 When you want to update the vault on demand:
 
 ```bash
-cd ~/obsidian-vault
+cd ~/.nexus  # or wherever your vault is cloned
 claude "Read VAULT_UPDATE_PROMPT.md. Today is $(date +%Y-%m-%d). 
 Run a full audit of the vault. Search the web for current state of all 
 recommended tools. Update any stale information. Append to CHANGELOG.md."
@@ -121,14 +121,14 @@ Add a cron job or use Inngest/GitHub Actions to run weekly:
 
 ```bash
 # crontab -e
-0 9 * * 1 cd ~/obsidian-vault && claude --no-interactive "Read VAULT_UPDATE_PROMPT.md. Run weekly audit. Search web for updates to recommended tools. Update stale info. Append to CHANGELOG.md. Commit changes." 2>&1 >> ~/vault-update.log
+0 9 * * 1 cd ~/.nexus  # or wherever your vault is cloned && claude --no-interactive "Read VAULT_UPDATE_PROMPT.md. Run weekly audit. Search web for updates to recommended tools. Update stale info. Append to CHANGELOG.md. Commit changes." 2>&1 >> ~/vault-update.log
 ```
 
 ### Signal-Triggered Update
 After your weekly signal scan, if you found something worth incorporating:
 
 ```bash
-cd ~/obsidian-vault
+cd ~/.nexus  # or wherever your vault is cloned
 claude "Read VAULT_UPDATE_PROMPT.md. I found this: [paste URL or description].
 Determine which notes this affects and update them. Add to Signal Log. 
 Append to CHANGELOG.md."
@@ -152,7 +152,7 @@ After the agent updates the vault:
 
 For long update sessions that might exceed the context window, the agent prompt includes identity reset instructions. But the better approach is:
 
-1. **Break updates into batches:** "Audit only the Tools MOC today"
+1. **Break updates into batches:** "Audit only the Tools today"
 2. **Use CHANGELOG.md as the state handoff:** the next session reads the changelog to know what was already updated
 3. **Git commits as checkpoints:** each batch of changes is committed before the next batch starts
 
@@ -164,7 +164,7 @@ This is the same [[Harness Engineering Overview#Shift Handoff Model|shift handof
 
 | Note Category | Audit Frequency | What to Check |
 |---------------|----------------|---------------|
-| Tools MOC + Stack Directory | Monthly | Deprecations, new releases, pricing changes |
+| Tools + Stack Directory | Monthly | Deprecations, new releases, pricing changes |
 | Beyond the Basics | Monthly | New IFYKYK tools, browser updates, plan changes |
 | AI Coding Tools (all) | Monthly | New features, new competitors, workflow changes |
 | Foundations notes | Quarterly | Pattern evolution, new research |
@@ -175,7 +175,7 @@ This is the same [[Harness Engineering Overview#Shift Handoff Model|shift handof
 
 ## Related
 - [[Template — Weekly Tools Review]] — the manual version of this
-- [[🗺️ Signals MOC]] — where new findings get logged
+- [[Signals]] — where new findings get logged
 - [[Harness Engineering Overview#Shift Handoff Model]] — the pattern this is based on
 
 ---
