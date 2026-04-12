@@ -63,7 +63,7 @@ cmd_init() {
     print_skip "lefthook.yml (already exists)"
   fi
 
-  # Claude Code hooks — strip onStop if Superpowers detected
+  # Claude Code hooks — strip Stop hook if Superpowers detected
   if [ ! -f ".claude/settings.json" ]; then
     mkdir -p .claude
     if [ -d "$HOME/.claude/plugins" ] && ls "$HOME/.claude/plugins" 2>/dev/null | grep -q superpowers; then
@@ -71,8 +71,8 @@ cmd_init() {
 import sys, json
 with open(sys.argv[1]) as f:
     data = json.load(f)
-if 'hooks' in data and 'onStop' in data['hooks']:
-    del data['hooks']['onStop']
+if 'hooks' in data and 'Stop' in data['hooks']:
+    del data['hooks']['Stop']
 json.dump(data, sys.stdout, indent=2)
 " "$TEMPLATES/claude-settings.json" > .claude/settings.json 2>/dev/null || cp "$TEMPLATES/claude-settings.json" .claude/settings.json
       echo -e "  ${GREEN}created${NC} settings.json ${DIM}(superpowers mode)${NC}"

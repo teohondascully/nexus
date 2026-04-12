@@ -3,12 +3,23 @@
     "PreToolUse": [
       {
         "matcher": "Bash|Read|Glob|Grep",
-        "command": "bash ~/.nexus/scripts/session-sync.sh 2>/dev/null || true"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.nexus/scripts/session-sync.sh 2>/dev/null || true"
+          }
+        ]
       }
     ],
-    "onStop": [
+    "Stop": [
       {
-        "command": "nexus doctor --quick 2>/dev/null || true"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "nexus doctor --quick 2>/dev/null || true"
+          }
+        ]
       }
     ]
   }
