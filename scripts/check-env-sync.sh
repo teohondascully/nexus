@@ -37,7 +37,8 @@ used_vars=$(
   printf '%s\n' "$used_raw" \
   | grep -oE "(process\.env|Bun\.env)\.[A-Z_][A-Z0-9_]*" \
   | sed -E 's/(process\.env|Bun\.env)\.//' \
-  | sort -u
+  | sort -u \
+  || true
 )
 
 if [[ -z "$used_vars" ]]; then

@@ -2,6 +2,7 @@
 # cli/update.sh — nexus update with section-level CLAUDE.md migration
 
 cmd_update() {
+  set +e
   echo ""
   echo -e "  ${BOLD}nexus update${NC}"
 

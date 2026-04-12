@@ -2,6 +2,9 @@
 # cli/doctor.sh — nexus doctor
 
 cmd_doctor() {
+  # Disable set -e for doctor — we handle errors ourselves
+  set +e
+
   local quick=false
   local fix=false
 
@@ -34,22 +37,22 @@ cmd_doctor() {
     bash scripts/sync-claude-md.sh 2>/dev/null || true
     if diff -q "$backup" "CLAUDE.md" > /dev/null 2>&1; then
       print_ok "CLAUDE.md file structure"
-      ((passed++))
+      ((passed++)) || true
     else
       if $fix; then
         print_ok "CLAUDE.md file structure ${DIM}(fixed)${NC}"
-        ((passed++))
+        ((passed++)) || true
       else
         cp "$backup" "CLAUDE.md"
         print_fail "CLAUDE.md file structure out of sync"
         echo -e "        ${DIM}Run: nexus doctor --fix${NC}"
-        ((failed++))
+        ((failed++)) || true
       fi
     fi
     rm -f "$backup"
   else
     print_skip "CLAUDE.md file structure"
-    ((skipped++))
+    ((skipped++)) || true
   fi
 
   # ── 2. .env.example coverage ─────────────────────────────────────
@@ -59,20 +62,20 @@ cmd_doctor() {
     local env_exit=$?
     if [ $env_exit -eq 0 ]; then
       print_ok ".env.example coverage"
-      ((passed++))
+      ((passed++)) || true
     else
       if $fix && [ -f ".env.example" ]; then
         echo "$env_output" | grep "^  " | tr -d ' ' | while IFS= read -r varname; do
           [ -n "$varname" ] && echo "${varname}= # TODO: set value" >> ".env.example"
         done
         print_ok ".env.example coverage ${DIM}(fixed)${NC}"
-        ((passed++))
+        ((passed++)) || true
       else
         print_fail ".env.example coverage"
         echo "$env_output" | head -3 | while IFS= read -r line; do
           echo -e "        ${DIM}${line}${NC}"
         done
-        ((failed++))
+        ((failed++)) || true
       fi
     fi
   elif $fix && [ ! -f ".env.example" ]; then
@@ -83,10 +86,10 @@ cmd_doctor() {
         echo "${var}=" >> .env.example
       done
     print_ok ".env.example ${DIM}(created)${NC}"
-    ((passed++))
+    ((passed++)) || true
   else
     print_skip ".env.example coverage"
-    ((skipped++))
+    ((skipped++)) || true
   fi
 
   # ── 3. Dependency direction ──────────────────────────────────────
@@ -95,17 +98,17 @@ cmd_doctor() {
     deps_output=$(bun scripts/check-deps-direction.ts 2>&1)
     if [ $? -eq 0 ]; then
       print_ok "Dependency direction"
-      ((passed++))
+      ((passed++)) || true
     else
       print_fail "Dependency direction"
       echo "$deps_output" | head -5 | while IFS= read -r line; do
         echo -e "        ${DIM}${line}${NC}"
       done
-      ((failed++))
+      ((failed++)) || true
     fi
   else
     print_skip "Dependency direction"
-    ((skipped++))
+    ((skipped++)) || true
   fi
 
   # ── 4. Hallucinated imports ──────────────────────────────────────
@@ -114,17 +117,17 @@ cmd_doctor() {
     hall_output=$(bun scripts/check-hallucinated-imports.ts 2>&1)
     if [ $? -eq 0 ]; then
       print_ok "Hallucinated imports"
-      ((passed++))
+      ((passed++)) || true
     else
       print_fail "Hallucinated imports"
       echo "$hall_output" | head -5 | while IFS= read -r line; do
         echo -e "        ${DIM}${line}${NC}"
       done
-      ((failed++))
+      ((failed++)) || true
     fi
   else
     print_skip "Hallucinated imports"
-    ((skipped++))
+    ((skipped++)) || true
   fi
 
   # ── 5. Dead exports (skip if --quick) ────────────────────────────
@@ -135,16 +138,16 @@ cmd_doctor() {
     dead_output=$(bun scripts/check-dead-exports.ts 2>&1)
     if [ $? -eq 0 ]; then
       print_ok "Dead exports"
-      ((passed++))
+      ((passed++)) || true
     else
       print_fail "Dead exports"
       echo "$dead_output" | head -5 | while IFS= read -r line; do
         echo -e "        ${DIM}${line}${NC}"
       done
-      ((failed++))
+      ((failed++)) || true
     fi
   else
-    if ! $quick; then print_skip "Dead exports"; ((skipped++)); fi
+    if ! $quick; then print_skip "Dead exports"; ((skipped++)) || true; fi
   fi
 
   # ── 6. Orphaned files (skip if --quick) ──────────────────────────
@@ -155,16 +158,16 @@ cmd_doctor() {
     orph_output=$(bun scripts/check-orphaned-files.ts 2>&1)
     if [ $? -eq 0 ]; then
       print_ok "Orphaned files"
-      ((passed++))
+      ((passed++)) || true
     else
       print_fail "Orphaned files"
       echo "$orph_output" | head -5 | while IFS= read -r line; do
         echo -e "        ${DIM}${line}${NC}"
       done
-      ((failed++))
+      ((failed++)) || true
     fi
   else
-    if ! $quick; then print_skip "Orphaned files"; ((skipped++)); fi
+    if ! $quick; then print_skip "Orphaned files"; ((skipped++)) || true; fi
   fi
 
   # ── 7. Nexus version (skip if --quick) ───────────────────────────
@@ -178,14 +181,14 @@ cmd_doctor() {
     remote_ver=$(git -C "$HOME/.nexus" show origin/main:VERSION 2>/dev/null || echo "")
     if [ -z "$remote_ver" ] || [ "$local_ver" = "$remote_ver" ]; then
       print_ok "Nexus v${local_ver}"
-      ((passed++))
+      ((passed++)) || true
     else
       print_fail "Nexus outdated (v${local_ver} → v${remote_ver})"
       echo -e "        ${DIM}Run: curl -fsSL https://www.teonnaise.com/install | bash${NC}"
-      ((failed++))
+      ((failed++)) || true
     fi
   else
-    if ! $quick; then print_skip "Nexus version"; ((skipped++)); fi
+    if ! $quick; then print_skip "Nexus version"; ((skipped++)) || true; fi
   fi
 
   # ── Summary ──────────────────────────────────────────────────────
@@ -205,55 +208,55 @@ cmd_doctor() {
     # No linter
     if [ -f "package.json" ] && ! grep -q '"eslint"\|"biome"\|"@biomejs"' package.json 2>/dev/null; then
       rec_lines="${rec_lines}   ~  No linter. Run: pnpm add -D eslint\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # TypeScript strict off
     if [ -f "tsconfig.json" ] && ! grep -q '"strict":\s*true' tsconfig.json 2>/dev/null; then
       rec_lines="${rec_lines}   ~  TypeScript strict mode is off\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # No formatter
     if [ -f "package.json" ] && ! ls .prettierrc* biome.json 2>/dev/null | grep -q .; then
       rec_lines="${rec_lines}   ~  No formatter. Run: pnpm add -D prettier\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # No test runner
     if [ -f "package.json" ] && ! grep -q '"vitest"\|"jest"\|"playwright"\|"@testing-library"' package.json 2>/dev/null; then
       rec_lines="${rec_lines}   ~  No test runner. Run: pnpm add -D vitest\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # No pre-commit hooks
     if [ ! -f "lefthook.yml" ] && [ ! -d ".husky" ]; then
       rec_lines="${rec_lines}   ~  No pre-commit hooks. Run: nexus init\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # No CLAUDE.md
     if [ ! -f "CLAUDE.md" ]; then
       rec_lines="${rec_lines}   ~  No CLAUDE.md. Run: nexus init\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # No .env.example
     if [ ! -f ".env.example" ] && [ -f "package.json" ]; then
       rec_lines="${rec_lines}   ~  No .env.example. Run: nexus doctor --fix\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # No engines field
     if [ -f "package.json" ] && ! grep -q '"engines"' package.json 2>/dev/null; then
       rec_lines="${rec_lines}   ~  No engines field in package.json. Pin your Node version.\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     # CommonJS
     if [ -f "package.json" ] && ! grep -q '"type":\s*"module"' package.json 2>/dev/null && [ -f "package.json" ]; then
       rec_lines="${rec_lines}   ~  No \"type\": \"module\" in package.json\n"
-      ((recs++))
+      ((recs++)) || true
     fi
 
     if [ $recs -gt 0 ]; then

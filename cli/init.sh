@@ -2,6 +2,9 @@
 # cli/init.sh — nexus init (zero questions)
 
 cmd_init() {
+  # Disable set -e — drop_file_silent returns 1 on skip, which is expected
+  set +e
+
   check_git
 
   # Detect or create project
