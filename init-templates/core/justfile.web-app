@@ -1,0 +1,67 @@
+# justfile — web app
+# Run with: just <command>
+
+set dotenv-load := true
+
+# Start local dev environment (Docker services + Next.js)
+dev:
+    docker compose up -d
+    pnpm dev
+
+# Build for production
+build:
+    pnpm build
+
+# Run the test suite
+test:
+    pnpm test
+
+# Type-check without emitting
+typecheck:
+    pnpm tsc --noEmit
+
+# Lint the codebase
+lint:
+    pnpm lint
+
+# ── Database ─────────────────────────────────────────────
+# Run pending DB migrations
+db-migrate:
+    pnpm drizzle-kit migrate
+
+# Seed the database
+db-seed:
+    bun packages/db/seed.ts
+
+# Drop and recreate the DB, then migrate and seed
+db-reset:
+    docker compose down -v
+    docker compose up -d
+    sleep 2
+    just db-migrate
+    just db-seed
+
+# Open Drizzle Studio
+db-studio:
+    pnpm drizzle-kit studio
+
+# ── Quality ──────────────────────────────────────────────
+# Run nexus doctor (all maintenance checks)
+doctor:
+    nexus doctor
+
+# Auto-fix doctor issues
+doctor-fix:
+    nexus doctor --fix
+
+# Show outdated dependencies
+outdated:
+    pnpm outdated
+
+# Find dead (unused) exports
+dead-code:
+    bun scripts/check-dead-exports.ts
+
+# Run all quality checks
+audit:
+    just doctor && just outdated && just dead-code

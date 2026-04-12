@@ -1,0 +1,27 @@
+# justfile — generic project
+
+set dotenv-load := true
+
+# Start the development server
+dev:
+    @echo "Configure your dev command here"
+
+# Build the project
+build:
+    @echo "Configure your build command here"
+
+# Run the test suite
+test:
+    @echo "Configure your test command here"
+
+# Check that all required tools and env vars are present
+doctor:
+    @echo "Configure your doctor command here"
+
+# Auto-fix common doctor issues
+doctor-fix:
+    @echo "Configure your doctor-fix command here"
+
+# Run security audit
+audit:
+    @echo "Configure your audit command here"
