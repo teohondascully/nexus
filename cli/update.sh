@@ -28,15 +28,19 @@ cmd_update() {
     ".github/pull_request_template.md"
   )
 
-  # Template source mapping
-  declare -A template_map
-  template_map["scripts/sync-claude-md.sh"]="$TEMPLATES/scripts/sync-claude-md.sh"
-  template_map["scripts/check-env-sync.sh"]="$TEMPLATES/scripts/check-env-sync.sh"
-  template_map["scripts/check-deps-direction.ts"]="$TEMPLATES/scripts/check-deps-direction.ts"
-  template_map["scripts/check-dead-exports.ts"]="$TEMPLATES/scripts/check-dead-exports.ts"
-  template_map["scripts/validate-startup.sh"]="$TEMPLATES/scripts/validate-startup.sh"
-  template_map["lefthook.yml"]="$TEMPLATES/hooks/lefthook.yml"
-  template_map[".github/pull_request_template.md"]="$TEMPLATES/core/pull_request_template.md"
+  # Template source lookup (bash 3.2 compatible — no associative arrays)
+  get_template() {
+    case "$1" in
+      "scripts/sync-claude-md.sh")         echo "$TEMPLATES/scripts/sync-claude-md.sh" ;;
+      "scripts/check-env-sync.sh")         echo "$TEMPLATES/scripts/check-env-sync.sh" ;;
+      "scripts/check-deps-direction.ts")   echo "$TEMPLATES/scripts/check-deps-direction.ts" ;;
+      "scripts/check-dead-exports.ts")     echo "$TEMPLATES/scripts/check-dead-exports.ts" ;;
+      "scripts/validate-startup.sh")       echo "$TEMPLATES/scripts/validate-startup.sh" ;;
+      "lefthook.yml")                      echo "$TEMPLATES/hooks/lefthook.yml" ;;
+      ".github/pull_request_template.md")  echo "$TEMPLATES/core/pull_request_template.md" ;;
+      *) echo "" ;;
+    esac
+  }
 
   local all_files=("${scripts[@]}" "${single_files[@]}")
 
@@ -46,7 +50,8 @@ cmd_update() {
 
   # ── 3. Compare files ─────────────────────────────────────────────
   for file in "${all_files[@]}"; do
-    local tmpl="${template_map[$file]}"
+    local tmpl
+    tmpl="$(get_template "$file")"
 
     # Skip if template doesn't exist
     if [ ! -f "$tmpl" ]; then
@@ -90,7 +95,8 @@ cmd_update() {
   if [[ "$answer" =~ ^[dD]$ ]]; then
     echo ""
     for file in "${actionable[@]}"; do
-      local tmpl="${template_map[$file]}"
+      local tmpl
+      tmpl="$(get_template "$file")"
       echo -e "  ${BOLD}--- ${file}${NC}"
       if [ ! -f "$file" ]; then
         echo -e "  ${CYAN}(new file)${NC}"
@@ -115,7 +121,8 @@ cmd_update() {
 
   # Apply updates
   for file in "${actionable[@]}"; do
-    local tmpl="${template_map[$file]}"
+    local tmpl
+    tmpl="$(get_template "$file")"
     local dir
     dir="$(dirname "$file")"
     mkdir -p "$dir"
