@@ -6,6 +6,7 @@
 # Reference: https://github.com/YOUR_USER/dotfiles
 # ================================================================
 set -e
+trap 'echo ""; echo "Cancelled."; exit 1' INT
 
 # ── Colors & Helpers ─────────────────────────────────────────────
 RED='\033[0;31m'
@@ -87,7 +88,8 @@ ask() {
   echo ""
   echo -e "${CYAN}?${NC} $1"
   echo -e "  ${DIM}$2${NC}"
-  read -p "  Install? [Y/n] " -n 1 -r
+  printf "  Install? [Y/n] "
+  read -n 1 -r REPLY < /dev/tty
   echo ""
   [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]
 }
@@ -166,39 +168,28 @@ show_audit() {
 # ── Welcome ──────────────────────────────────────────────────────
 clear
 echo ""
-echo -e "${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}║           Machine Bootstrap — Dev Environment            ║${NC}"
-echo -e "${BOLD}║              Last approved by Teo: 2026-04-11            ║${NC}"
-echo -e "${BOLD}╠══════════════════════════════════════════════════════════╣${NC}"
-echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  This script sets up a complete dev environment:          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    1.  Xcode CLI Tools     ${DIM}(git, compilers)${NC}              ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    2.  Homebrew             ${DIM}(package manager)${NC}             ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    3.  Ghostty + config     ${DIM}(terminal emulator)${NC}           ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    4.  Modern CLI tools     ${DIM}(ripgrep, bat, eza, etc.)${NC}     ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    5.  Advanced CLI tools   ${DIM}(httpie, yazi, btop, etc.)${NC}    ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    6.  mise                 ${DIM}(version manager)${NC}             ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    7.  Node + pnpm + Bun    ${DIM}(JS runtimes & packages)${NC}     ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    8.  Python + uv + Ruff   ${DIM}(Python toolchain)${NC}           ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}    9.  Docker Desktop       ${DIM}(containerization)${NC}            ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   10.  Claude Code          ${DIM}(CLI AI agent)${NC}                ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   11.  Git config           ${DIM}(delta, rebase, rerere)${NC}       ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   12.  Shell config         ${DIM}(aliases, prompt, tools)${NC}      ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  ${GREEN}Safe to re-run — skips anything already installed.${NC}      ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  ${YELLOW}Optional steps will ask before installing.${NC}              ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
-echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"
+echo -e "  ${BOLD}nexus bootstrap${NC}"
 echo ""
-echo -e "  Press ${BOLD}Enter${NC} to start    ${DIM}│${NC}    Press ${BOLD}i${NC} to inspect everything first"
-read -n 1 -r
+echo -e "  12 steps. Skips anything already installed."
+echo -e "  Optional steps ask before installing."
+echo ""
+echo -e "   ${BOLD} 1${NC}  Xcode CLI Tools     ${BOLD} 7${NC}  Node + pnpm + Bun"
+echo -e "   ${BOLD} 2${NC}  Homebrew             ${BOLD} 8${NC}  Python + uv + Ruff"
+echo -e "   ${BOLD} 3${NC}  Ghostty + config     ${BOLD} 9${NC}  Docker Desktop"
+echo -e "   ${BOLD} 4${NC}  Modern CLI tools     ${BOLD}10${NC}  Claude Code"
+echo -e "   ${BOLD} 5${NC}  Advanced CLI tools   ${BOLD}11${NC}  Git config"
+echo -e "   ${BOLD} 6${NC}  mise                 ${BOLD}12${NC}  Shell config"
+echo ""
+echo -e "  ${GREEN}Safe to re-run.${NC} ${DIM}github.com/teohondascully/nexus${NC}"
+echo ""
+printf "  Enter to start · i to inspect · Ctrl-C to cancel "
+read -n 1 -r REPLY < /dev/tty
 echo ""
 
 if [[ $REPLY == "i" || $REPLY == "I" ]]; then
   show_audit
-  echo -e "  Press ${BOLD}Enter${NC} to continue with install    ${DIM}│${NC}    ${BOLD}Ctrl+C${NC} to cancel"
-  read -r
+  printf "  Enter to start · Ctrl-C to cancel "
+  read -r _ < /dev/tty
 fi
 
 # ═════════════════════════════════════════════════════════════════
@@ -212,7 +203,8 @@ else
   echo "  Installing Xcode CLI tools (this opens a system dialog)..."
   xcode-select --install
   echo ""
-  read -p "  Press Enter after the Xcode installer finishes..."
+  printf "  Press Enter after the Xcode installer finishes..."
+  read -r _ < /dev/tty
   installed "xcode-select" "compilers, git, make"
 fi
 
@@ -473,11 +465,13 @@ installed "git config" "delta pager, rebase, rerere"
 # Only prompt for identity if not already set
 if [ -z "$(git config --global user.name)" ]; then
   echo ""
-  read -p "  Git name (for commits): " git_name
+  printf "  Git name (for commits): "
+  read -r git_name < /dev/tty
   git config --global user.name "$git_name"
 fi
 if [ -z "$(git config --global user.email)" ]; then
-  read -p "  Git email (for commits): " git_email
+  printf "  Git email (for commits): "
+  read -r git_email < /dev/tty
   git config --global user.email "$git_email"
 fi
 
