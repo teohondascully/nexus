@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-04-12 — Nexus CLI Redesign + Vault Sync
+**Agent:** Claude Code (Opus 4.6, 1M context)
+**Trigger:** Manual — full CLI rewrite + documentation sync
+
+### CLI Redesign
+- Replaced 525-line prompt-builder CLI with modular project initializer + maintenance system
+- New commands: `nexus init`, `nexus add` (db/auth/api/hooks/ci), `nexus doctor`, `nexus update`, `nexus version`, `nexus uninstall`
+- 27 template files across core, scripts, hooks, db, auth, api, ci
+- Three-layer hook system: lefthook (pre-commit), Claude Code hooks (agent-time), justfile (manual)
+- Maintenance scripts: CLAUDE.md file-tree sync, env var sync, dependency direction linter, dead export detection, startup validation
+- Smart install script: version detection, update-only vs full reinstall, selective package uninstall
+- VERSION file (v1.0.0) for release tracking
+- Full code review audit: 3 critical + 6 important issues found and fixed
+
+### Vault Documentation Updates
+- Rewrote README.md with new CLI commands, file structure, doctor output
+- Updated HOME.md with nexus update reference
+- Updated Tools MOC with nexus CLI in Workflow Optimization section
+- Updated Template — Machine Bootstrap with new quick start and CLI commands
+- Updated bootstrap.sh references from "session launcher" to "project initializer + maintenance"
+
+### Files Modified
+`README.md`, `HOME.md`, `CHANGELOG.md`, `bootstrap.sh`, `tools/Tools.md`, `templates/Template — Machine Bootstrap.md`, plus all new files in `cli/`, `init-templates/`, `VERSION`, `install.sh`, `nexus`, `docs/superpowers/`
+
+---
+
 ## 2026-04-12 — Weekly Audit #2
 **Agent:** Claude Code (Opus 4.6, 1M context)
 **Trigger:** Manual — vault update agent prompt

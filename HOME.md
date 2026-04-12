@@ -33,7 +33,8 @@ AI news, framework releases, paradigm shifts. Raw signal → processed insight �
 ## Vault Maintenance
 - [[Vault Maintenance System]] — how to keep this vault alive using Claude Code
 - [[CHANGELOG]] — what's been updated and when
-- Run `claude "Read VAULT_UPDATE_PROMPT.md. Run weekly audit."` to update
+- Run `claude "Read VAULT_UPDATE_PROMPT.md. Run weekly audit."` to update the vault
+- Run `nexus update` to sync project-level templates against the latest vault
 
 ## Core Principles
 1. **Foundations over frameworks** — learn the pattern, not just the tool

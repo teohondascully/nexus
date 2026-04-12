@@ -10,9 +10,20 @@
 curl -fsSL https://www.teonnaise.com/install | bash
 ```
 
-This silently clones the nexus repo to `~/.nexus`, then launches the interactive bootstrap below. Nothing installs until you press Enter.
+This silently clones the nexus repo to `~/.nexus`, then launches the interactive bootstrap. Nothing installs until you press Enter. Re-running detects the existing install, compares versions, and offers update-only or full reinstall.
 
 The install script lives at `install.sh` in the repo root. The bootstrap script is `bootstrap.sh`.
+
+After bootstrap, the `nexus` CLI is available:
+
+```
+nexus init [name]       Create or configure a project
+nexus add <layer>       Add a layer: db, auth, api, hooks, ci
+nexus doctor            Run maintenance checks
+nexus update            Sync project templates against latest vault
+nexus version           Show installed version
+nexus uninstall         Remove nexus
+```
 
 ---
 
