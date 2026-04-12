@@ -1,6 +1,6 @@
 # Template — Machine Bootstrap
 
-> One script. Fresh Mac to fully operational dev environment in under 15 minutes. Run this on day 1.
+> One script. Fresh Mac to fully operational dev environment. Safe to re-run. Interactive. Last updated: **2026-04-11**.
 
 ---
 
@@ -10,43 +10,182 @@ Save as `~/bootstrap.sh` and run with `bash bootstrap.sh`:
 
 ```bash
 #!/bin/bash
+# ================================================================
+# Machine Bootstrap — Interactive Dev Environment Setup
+# Last updated: 2026-04-11
+# Safe to re-run: skips anything already installed
+# Reference: https://github.com/YOUR_USER/dotfiles
+# ================================================================
 set -e
 
-echo "🚀 Setting up dev machine..."
+# ── Colors & Helpers ─────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+DIM='\033[2m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
 
-# ============================================
-# 1. Xcode Command Line Tools (git, make, etc)
-# ============================================
-if ! xcode-select -p &> /dev/null; then
-  echo "Installing Xcode CLI tools..."
+TOTAL_STEPS=13
+CURRENT_STEP=0
+INSTALLED=()
+SKIPPED=()
+FAILED=()
+
+step() {
+  CURRENT_STEP=$((CURRENT_STEP + 1))
+  echo ""
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "${BOLD}[$CURRENT_STEP/$TOTAL_STEPS] $1${NC}"
+  echo -e "${DIM}$2${NC}"
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
+
+installed() {
+  echo -e "  ${GREEN}✓${NC} $1 ${DIM}($2)${NC}"
+  INSTALLED+=("$1")
+}
+
+skipped() {
+  echo -e "  ${YELLOW}→${NC} $1 ${DIM}(already installed)${NC}"
+  SKIPPED+=("$1")
+}
+
+warn() {
+  echo -e "  ${YELLOW}!${NC} $1"
+}
+
+fail() {
+  echo -e "  ${RED}✗${NC} $1"
+  FAILED+=("$1")
+}
+
+has_cmd() {
+  command -v "$1" &> /dev/null
+}
+
+has_cask() {
+  brew list --cask "$1" &> /dev/null 2>&1
+}
+
+has_formula() {
+  brew list "$1" &> /dev/null 2>&1
+}
+
+brew_install() {
+  local name="$1"
+  local desc="$2"
+  if has_formula "$name"; then
+    skipped "$name"
+  else
+    brew install "$name" > /dev/null 2>&1 && installed "$name" "$desc" || fail "$name"
+  fi
+}
+
+brew_install_cask() {
+  local name="$1"
+  local desc="$2"
+  if has_cask "$name"; then
+    skipped "$name"
+  else
+    brew install --cask "$name" > /dev/null 2>&1 && installed "$name" "$desc" || fail "$name"
+  fi
+}
+
+ask() {
+  echo ""
+  echo -e "${CYAN}?${NC} $1"
+  echo -e "  ${DIM}$2${NC}"
+  read -p "  Install? [Y/n] " -n 1 -r
+  echo ""
+  [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]
+}
+
+# ── Welcome ──────────────────────────────────────────────────────
+clear
+echo ""
+echo -e "${BOLD}╔════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║          Machine Bootstrap — Dev Environment          ║${NC}"
+echo -e "${BOLD}║                  Last updated: 2026-04-11             ║${NC}"
+echo -e "${BOLD}╠════════════════════════════════════════════════════════╣${NC}"
+echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  This script sets up a complete dev environment:       ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   1.  Xcode CLI Tools    ${DIM}(git, compilers)${NC}              ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   2.  Homebrew            ${DIM}(package manager)${NC}            ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   3.  Ghostty + config    ${DIM}(terminal emulator)${NC}          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   4.  Modern CLI tools    ${DIM}(ripgrep, bat, eza, etc.)${NC}    ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   5.  Advanced CLI tools  ${DIM}(httpie, yazi, btop, etc.)${NC}   ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   6.  mise                ${DIM}(version manager)${NC}            ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   7.  Node + pnpm + Bun   ${DIM}(JS runtimes & packages)${NC}    ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   8.  Python + uv + Ruff  ${DIM}(Python toolchain)${NC}          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   9.  Docker Desktop      ${DIM}(containerization)${NC}           ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  10.  Cursor              ${DIM}(AI-native IDE)${NC}              ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  11.  Claude Code         ${DIM}(CLI AI agent)${NC}               ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  12.  Git config          ${DIM}(delta, rebase, rerere)${NC}      ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  13.  Shell config        ${DIM}(aliases, prompt, tools)${NC}     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  ${GREEN}Safe to re-run — skips anything already installed.${NC}    ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  ${YELLOW}Optional steps will ask before installing.${NC}           ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
+echo -e "${BOLD}╚════════════════════════════════════════════════════════╝${NC}"
+echo ""
+read -p "Press Enter to start (or Ctrl+C to cancel)..."
+
+# ═════════════════════════════════════════════════════════════════
+# STEP 1: Xcode Command Line Tools
+# ═════════════════════════════════════════════════════════════════
+step "Xcode Command Line Tools" "Provides git, clang, make, and other compilers. Required by almost everything else."
+
+if xcode-select -p &> /dev/null; then
+  skipped "xcode-select"
+else
+  echo "  Installing Xcode CLI tools (this opens a system dialog)..."
   xcode-select --install
-  read -p "Press enter after Xcode tools finish installing..."
+  echo ""
+  read -p "  Press Enter after the Xcode installer finishes..."
+  installed "xcode-select" "compilers, git, make"
 fi
 
-# ============================================
-# 2. Homebrew
-# ============================================
-if ! command -v brew &> /dev/null; then
-  echo "Installing Homebrew..."
+# ═════════════════════════════════════════════════════════════════
+# STEP 2: Homebrew
+# ═════════════════════════════════════════════════════════════════
+step "Homebrew" "macOS package manager. Installs everything else. https://brew.sh"
+
+if has_cmd brew; then
+  skipped "homebrew"
+  echo "  Updating brew..."
+  brew update > /dev/null 2>&1
+else
+  echo "  Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
+  # Add to PATH for this session
   eval "$(/opt/homebrew/bin/brew shellenv)"
+  # Persist for future sessions (only if not already there)
+  if ! grep -q 'brew shellenv' ~/.zprofile 2>/dev/null; then
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+  fi
+  installed "homebrew" "package manager"
 fi
 
-# ============================================
-# 3. Terminal + Shell Tools
-# ============================================
-echo "Installing terminal and shell tools..."
-brew install --cask ghostty           # Terminal emulator
-brew install starship                  # Shell prompt
-brew install --cask font-jetbrains-mono-nerd-font  # Font with icons
+# ═════════════════════════════════════════════════════════════════
+# STEP 3: Terminal + Prompt + Font
+# ═════════════════════════════════════════════════════════════════
+step "Terminal: Ghostty + Starship + Font" "GPU-accelerated terminal (Zig), fast prompt (Rust), icon font for the shell."
 
-# Ghostty config + Catppuccin theme
-mkdir -p ~/.config/ghostty/themes
-curl -o ~/.config/ghostty/themes/catppuccin-mocha \
-  https://raw.githubusercontent.com/catppuccin/ghostty/main/themes/catppuccin-mocha
+brew_install_cask "ghostty" "GPU-accelerated terminal by Mitchell Hashimoto"
+brew_install "starship" "cross-shell prompt — shows git, node, python versions"
+brew_install_cask "font-jetbrains-mono-nerd-font" "monospace font with ligatures + icons"
 
-cat > ~/.config/ghostty/config << 'GHOSTTY'
+# Ghostty config (only write if no config exists yet)
+if [ ! -f ~/.config/ghostty/config ]; then
+  echo "  Writing Ghostty config + Catppuccin theme..."
+  mkdir -p ~/.config/ghostty/themes
+  curl -so ~/.config/ghostty/themes/catppuccin-mocha \
+    https://raw.githubusercontent.com/catppuccin/ghostty/main/themes/catppuccin-mocha
+  cat > ~/.config/ghostty/config << 'GHOSTTY'
 font-family = JetBrains Mono
 font-size = 14
 theme = catppuccin-mocha
@@ -72,81 +211,170 @@ keybind = cmd+d=new_split:right
 keybind = cmd+shift+d=new_split:down
 keybind = cmd+shift+enter=toggle_split_zoom
 GHOSTTY
+  installed "ghostty config" "catppuccin-mocha, splits, transparency"
+else
+  skipped "ghostty config"
+fi
 
-# ============================================
-# 4. Modern CLI Replacements
-# ============================================
-echo "Installing modern CLI tools..."
-brew install \
-  fzf \
-  ripgrep \
-  bat \
-  eza \
-  zoxide \
-  git-delta \
-  lazygit \
-  fd \
-  httpie \
-  jq \
-  atuin \
-  lazydocker \
-  tldr \
-  btop \
-  yazi \
-  hyperfine \
-  dust \
-  dive
+# ═════════════════════════════════════════════════════════════════
+# STEP 4: Essential CLI Tools
+# ═════════════════════════════════════════════════════════════════
+step "Essential CLI Tools" "Modern Rust/Go replacements for grep, cat, ls, find, cd, git. 10-100x faster."
 
-# ============================================
-# 5. Version Manager (mise)
-# ============================================
-echo "Installing mise..."
-brew install mise
+brew_install "fzf"       "fuzzy finder — search files, history, branches"
+brew_install "ripgrep"   "rg — grep but 100x faster, respects .gitignore"
+brew_install "bat"       "cat with syntax highlighting + line numbers"
+brew_install "eza"       "ls with icons, colors, git status, tree view"
+brew_install "zoxide"    "smart cd — learns your directories, jump with partial names"
+brew_install "git-delta" "beautiful syntax-highlighted git diffs"
+brew_install "lazygit"   "terminal UI for git — stage, rebase, resolve conflicts visually"
+brew_install "fd"        "find but simpler + faster, respects .gitignore"
 
-# ============================================
-# 6. Runtime + Package Managers
-# ============================================
-echo "Installing runtimes..."
-eval "$(mise activate zsh)"
-mise use --global node@24
-mise use --global python@3.12
+# ═════════════════════════════════════════════════════════════════
+# STEP 5: Advanced CLI Tools
+# ═════════════════════════════════════════════════════════════════
+step "Advanced CLI Tools" "Power tools for API testing, monitoring, Docker, benchmarks, file management."
 
-# pnpm (JS package manager)
-npm install -g pnpm
+brew_install "atuin"       "shell history search — full-text, syncs across machines"
+brew_install "httpie"      "human-friendly HTTP client — replaces curl for API testing"
+brew_install "jq"          "command-line JSON processor — filter, transform, extract"
+brew_install "yazi"        "terminal file manager — preview images, bulk rename"
+brew_install "hyperfine"   "CLI benchmarking — compare command performance"
+brew_install "lazydocker"  "terminal UI for Docker — logs, restart, shell into containers"
+brew_install "tldr"        "simplified man pages with practical examples"
+brew_install "btop"        "beautiful system monitor — CPU, memory, disk, network"
+brew_install "dust"        "disk usage analyzer — visual, sorted, fast"
+brew_install "dive"        "Docker image layer inspector — find bloat"
 
-# Bun (fast JS runtime)
-curl -fsSL https://bun.sh/install | bash
+# ═════════════════════════════════════════════════════════════════
+# STEP 6: Version Manager (mise)
+# ═════════════════════════════════════════════════════════════════
+step "mise — Version Manager" "One tool for all runtimes (Node, Python, Go, etc). Replaces nvm + pyenv + rbenv."
 
-# uv (Python package manager)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+brew_install "mise" "polyglot version manager — manages runtimes, env vars, tasks"
 
-# Ruff (Python linter — same team as uv)
-uv tool install ruff
+# ═════════════════════════════════════════════════════════════════
+# STEP 7: JavaScript Runtimes + Packages
+# ═════════════════════════════════════════════════════════════════
+step "JavaScript: Node + pnpm + Bun" "Node 24 LTS via mise, pnpm for monorepos, Bun for speed."
 
-# ============================================
-# 7. Docker
-# ============================================
-echo "Installing Docker..."
-brew install --cask docker
-# Note: Docker Desktop needs to be opened manually the first time
+# Activate mise for this session
+if has_cmd mise; then
+  eval "$(mise activate bash)"
 
-# ============================================
-# 8. Editor
-# ============================================
-echo "Installing editors..."
-brew install --cask cursor            # AI-native IDE
-# brew install --cask visual-studio-code  # Uncomment if preferred
+  # Node.js
+  if mise ls node 2>/dev/null | grep -q "24"; then
+    skipped "node@24"
+  else
+    echo "  Installing Node.js 24 LTS via mise..."
+    mise use --global node@24 > /dev/null 2>&1 && installed "node@24" "LTS — also 22 LTS available" || fail "node@24"
+  fi
 
-# ============================================
-# 9. Claude Code
-# ============================================
-echo "Installing Claude Code..."
-npm install -g @anthropic-ai/claude-code
+  # pnpm
+  if has_cmd pnpm; then
+    skipped "pnpm"
+  else
+    echo "  Installing pnpm..."
+    npm install -g pnpm > /dev/null 2>&1 && installed "pnpm" "fast, strict, disk-efficient package manager" || fail "pnpm"
+  fi
+else
+  warn "mise not found — skipping Node/pnpm install. Install mise first."
+fi
 
-# ============================================
-# 10. Git Config
-# ============================================
-echo "Configuring git..."
+# Bun
+if has_cmd bun; then
+  skipped "bun"
+else
+  if ask "Bun (JavaScript runtime)" "3x faster HTTP, native TypeScript, 25x faster installs. Best for new greenfield projects."; then
+    curl -fsSL https://bun.sh/install | bash > /dev/null 2>&1 && installed "bun" "fast JS runtime + bundler + test runner" || fail "bun"
+  fi
+fi
+
+# ═════════════════════════════════════════════════════════════════
+# STEP 8: Python Toolchain
+# ═════════════════════════════════════════════════════════════════
+step "Python: uv + Ruff" "uv replaces pip/venv/pyenv (10-100x faster). Ruff replaces pylint/flake8 (100x faster)."
+
+# Python via mise
+if has_cmd mise; then
+  if mise ls python 2>/dev/null | grep -q "3.12"; then
+    skipped "python@3.12"
+  else
+    if ask "Python 3.12 (via mise)" "Managed by mise — no system Python conflicts."; then
+      mise use --global python@3.12 > /dev/null 2>&1 && installed "python@3.12" "via mise" || fail "python@3.12"
+    fi
+  fi
+fi
+
+# uv
+if has_cmd uv; then
+  skipped "uv"
+else
+  if ask "uv (Python package manager by Astral)" "10-100x faster than pip. Also replaces venv and pyenv."; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh > /dev/null 2>&1 && installed "uv" "fast Python package/project manager" || fail "uv"
+  fi
+fi
+
+# Ruff
+if has_cmd ruff; then
+  skipped "ruff"
+else
+  if has_cmd uv; then
+    if ask "Ruff (Python linter by Astral)" "100x faster than pylint. Same team as uv."; then
+      uv tool install ruff > /dev/null 2>&1 && installed "ruff" "fast Python linter + formatter" || fail "ruff"
+    fi
+  fi
+fi
+
+# ═════════════════════════════════════════════════════════════════
+# STEP 9: Docker
+# ═════════════════════════════════════════════════════════════════
+step "Docker Desktop" "Run Postgres, Redis, and other services in containers. Your app runs locally, infra runs in Docker."
+
+if has_cask docker || has_cmd docker; then
+  skipped "docker"
+else
+  if ask "Docker Desktop" "Required for local databases (Postgres, Redis). You'll manage containers with lazydocker."; then
+    brew_install_cask "docker" "containerization platform"
+    warn "Docker Desktop needs to be opened manually the first time to finish setup."
+  fi
+fi
+
+# ═════════════════════════════════════════════════════════════════
+# STEP 10: Editor
+# ═════════════════════════════════════════════════════════════════
+step "Editor: Cursor" "AI-native IDE (VS Code fork). Use alongside Claude Code for visual diff review."
+
+if has_cask cursor; then
+  skipped "cursor"
+else
+  if ask "Cursor (AI-native IDE)" "VS Code fork with Composer, background agents, Design Mode. \$20/mo for Pro."; then
+    brew_install_cask "cursor" "AI-native IDE"
+  fi
+fi
+
+# ═════════════════════════════════════════════════════════════════
+# STEP 11: Claude Code
+# ═════════════════════════════════════════════════════════════════
+step "Claude Code" "Anthropic's CLI agent. Terminal-first, hooks for verification, 1M context, MCP servers."
+
+if has_cmd claude; then
+  skipped "claude-code"
+else
+  if has_cmd npm; then
+    echo "  Installing Claude Code via npm..."
+    npm install -g @anthropic-ai/claude-code > /dev/null 2>&1 && installed "claude-code" "CLI AI agent by Anthropic" || fail "claude-code"
+  else
+    warn "npm not found — install Node.js first, then run: npm install -g @anthropic-ai/claude-code"
+  fi
+fi
+
+# ═════════════════════════════════════════════════════════════════
+# STEP 12: Git Config
+# ═════════════════════════════════════════════════════════════════
+step "Git Config" "delta for beautiful diffs, rebase on pull, auto-setup remote, rerere for conflict memory."
+
+# These are safe to set even if already set (idempotent)
 git config --global core.pager delta
 git config --global interactive.diffFilter 'delta --color-only'
 git config --global delta.navigate true
@@ -155,41 +383,43 @@ git config --global init.defaultBranch main
 git config --global pull.rebase true
 git config --global push.autoSetupRemote true
 git config --global rerere.enabled true
+installed "git config" "delta pager, rebase, rerere"
 
-# Prompt for identity if not set
+# Only prompt for identity if not already set
 if [ -z "$(git config --global user.name)" ]; then
-  read -p "Git name: " git_name
+  echo ""
+  read -p "  Git name (for commits): " git_name
   git config --global user.name "$git_name"
 fi
 if [ -z "$(git config --global user.email)" ]; then
-  read -p "Git email: " git_email
+  read -p "  Git email (for commits): " git_email
   git config --global user.email "$git_email"
 fi
 
-# ============================================
-# 11. Shell Config
-# ============================================
-echo "Configuring shell..."
-cat >> ~/.zshrc << 'ZSHRC'
+# ═════════════════════════════════════════════════════════════════
+# STEP 13: Shell Config
+# ═════════════════════════════════════════════════════════════════
+step "Shell Config" "Aliases, tool integrations, prompt. Appended to ~/.zshrc."
 
-# === Builder's Brain Shell Config ===
+# Only append if we haven't already (check for our marker comment)
+if grep -q "# === Nexus Shell Config ===" ~/.zshrc 2>/dev/null; then
+  skipped "shell config (already in ~/.zshrc)"
+else
+  echo "  Appending shell config to ~/.zshrc..."
+  cat >> ~/.zshrc << 'ZSHRC'
 
-# Starship prompt
-eval "$(starship init zsh)"
+# === Nexus Shell Config ===
+# Generated by bootstrap.sh — edit freely, but keep the marker above
+# so re-running bootstrap doesn't duplicate this block.
 
-# mise (version manager)
-eval "$(mise activate zsh)"
+# ── Tool Integrations ────────────────────────────────────────
+eval "$(starship init zsh)"      # prompt
+eval "$(mise activate zsh)"      # version manager
+eval "$(zoxide init zsh --cmd cd)"  # smart cd (works as normal cd too)
+source <(fzf --zsh)              # fuzzy finder
+eval "$(atuin init zsh)"         # shell history
 
-# zoxide (smart cd)
-eval "$(zoxide init zsh)"
-
-# fzf (fuzzy finder)
-source <(fzf --zsh)
-
-# atuin (shell history)
-eval "$(atuin init zsh)"
-
-# Modern aliases — essentials
+# ── Aliases: Essentials ──────────────────────────────────────
 alias cat="bat"
 alias ls="eza --icons"
 alias ll="eza -l --git --icons"
@@ -202,36 +432,34 @@ alias lzd="lazydocker"
 alias top="btop"
 alias du="dust"
 
-# fzf preview
+# ── Aliases: Dev Shortcuts ───────────────────────────────────
 alias preview="fzf --preview 'bat --color=always {}'"
-
-# httpie shortcuts for local dev
 alias api="http localhost:3000/api"
 alias apih="http localhost:3000/api/health"
-
-# jq shortcuts
 alias json="jq ."
 alias jsonkeys="jq 'keys'"
+alias dev="cd ~/dev"
 
-# yazi — cd into the directory you were browsing when you quit
+# ── Functions ────────────────────────────────────────────────
+# yazi: cd into the directory you were browsing when you quit
 function y() {
-  local tmp="\$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  yazi "\$@" --cwd-file="\$tmp"
-  if cwd="\$(command cat -- "\$tmp")" && [ -n "\$cwd" ] && [ "\$cwd" != "\$PWD" ]; then
-    builtin cd -- "\$cwd"
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
   fi
-  rm -f -- "\$tmp"
+  rm -f -- "$tmp"
 }
 
-# Quick project navigation
-alias dev="cd ~/dev"
+# === End Nexus Shell Config ===
 ZSHRC
+  installed "shell config" "aliases, integrations, yazi function"
+fi
 
-# ============================================
-# 12. Starship Config
-# ============================================
-mkdir -p ~/.config
-cat > ~/.config/starship.toml << 'STARSHIP'
+# Starship config (only write if no config exists)
+if [ ! -f ~/.config/starship.toml ]; then
+  mkdir -p ~/.config
+  cat > ~/.config/starship.toml << 'STARSHIP'
 [character]
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
@@ -249,34 +477,68 @@ format = "[$version](yellow) "
 min_time = 2_000
 format = "[$duration]($style) "
 STARSHIP
+  installed "starship config" "minimal prompt"
+else
+  skipped "starship config"
+fi
 
-# ============================================
-# 13. Create dev directory
-# ============================================
+# Dev directory
 mkdir -p ~/dev
 
-# ============================================
-# Done
-# ============================================
+# ═════════════════════════════════════════════════════════════════
+# SUMMARY
+# ═════════════════════════════════════════════════════════════════
 echo ""
-echo "✅ Setup complete!"
 echo ""
-echo "Next steps:"
+echo -e "${BOLD}╔════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║                    Setup Complete                     ║${NC}"
+echo -e "${BOLD}╚════════════════════════════════════════════════════════╝${NC}"
+echo ""
+
+if [ ${#INSTALLED[@]} -gt 0 ]; then
+  echo -e "${GREEN}Installed (${#INSTALLED[@]}):${NC}"
+  for item in "${INSTALLED[@]}"; do
+    echo -e "  ${GREEN}✓${NC} $item"
+  done
+  echo ""
+fi
+
+if [ ${#SKIPPED[@]} -gt 0 ]; then
+  echo -e "${YELLOW}Already installed (${#SKIPPED[@]}):${NC}"
+  for item in "${SKIPPED[@]}"; do
+    echo -e "  ${YELLOW}→${NC} $item"
+  done
+  echo ""
+fi
+
+if [ ${#FAILED[@]} -gt 0 ]; then
+  echo -e "${RED}Failed (${#FAILED[@]}):${NC}"
+  for item in "${FAILED[@]}"; do
+    echo -e "  ${RED}✗${NC} $item"
+  done
+  echo ""
+fi
+
+echo -e "${BOLD}Next steps:${NC}"
 echo "  1. Restart your terminal (or run: source ~/.zshrc)"
-echo "  2. Open Docker Desktop (first launch requires manual start)"
-echo "  3. Open Ghostty — config and theme are already set up"
-echo "  4. Run 'claude' to set up Claude Code API key"
-echo "  5. Start building: cd ~/dev && mkdir my-project && cd my-project"
+if has_cask docker 2>/dev/null; then
+  echo "  2. Open Docker Desktop (first launch needs manual start)"
+fi
+if has_cmd claude; then
+  echo "  3. Run 'claude' to set up your Anthropic API key"
+fi
 echo ""
-echo "Your tools:"
-echo "  Terminal:  ghostty"
-echo "  Editor:    cursor"
-echo "  Git TUI:   lg (lazygit)"
-echo "  Docker:    lzd (lazydocker)"
-echo "  AI Agent:  claude (Claude Code)"
-echo "  Search:    rg (ripgrep)"
-echo "  Navigate:  z (zoxide)"
-echo "  Find:      fzf, fd"
+echo -e "${BOLD}Your toolkit:${NC}"
+echo -e "  ${CYAN}Terminal${NC}    ghostty          ${CYAN}Git TUI${NC}     lg (lazygit)"
+echo -e "  ${CYAN}Editor${NC}     cursor           ${CYAN}Docker TUI${NC}  lzd (lazydocker)"
+echo -e "  ${CYAN}AI Agent${NC}   claude           ${CYAN}Monitor${NC}     btop (or: top)"
+echo -e "  ${CYAN}Search${NC}     rg (ripgrep)     ${CYAN}Disk${NC}        dust (or: du)"
+echo -e "  ${CYAN}Navigate${NC}   cd (zoxide)      ${CYAN}Files${NC}       y (yazi)"
+echo -e "  ${CYAN}Find${NC}       fd + fzf         ${CYAN}API Test${NC}    http (httpie)"
+echo -e "  ${CYAN}JSON${NC}       jq               ${CYAN}History${NC}     atuin (ctrl+r)"
+echo -e "  ${CYAN}Benchmark${NC}  hyperfine        ${CYAN}Man Pages${NC}   tldr"
+echo ""
+echo -e "${DIM}Script version: 2026-04-11 | Reference: The Developer Machine note${NC}"
 echo ""
 ```
 
@@ -284,17 +546,32 @@ echo ""
 
 ## After Bootstrap
 
-1. **Verify everything works:** `node --version && python --version && bun --version && uv --version && docker --version`
-2. **Clone your dotfiles** if you have them, overwrite the defaults above
-3. **Open Docker Desktop** — it needs a one-time manual launch to finish setup
-4. **Set up Claude Code:** run `claude` and follow the API key setup
+1. **Restart terminal** — `source ~/.zshrc` or just close and reopen
+2. **Verify:**
+   ```bash
+   node --version && pnpm --version && bun --version && uv --version && python3 --version && docker --version
+   ```
+3. **Open Docker Desktop** — first launch needs a manual start to finish setup
+4. **Set up Claude Code:** run `claude` and follow the API key flow
 5. **Start your first project** using [[Template — Monorepo Scaffold]]
+
+## Re-Running the Script
+
+The script is **fully idempotent** — safe to run again at any time:
+
+- Already-installed tools are skipped (shows "already installed")
+- Config files are only written if they don't exist yet
+- Shell config uses a marker comment to avoid duplicating the block
+- Optional tools (Bun, Python, Docker, Cursor) ask before installing
+- The summary at the end shows exactly what was installed, skipped, or failed
+
+Run it after a system update, after restoring from backup, or just to verify everything is in place.
 
 ## Maintaining Your Setup
 
-- **Store this script in a git repo** along with your dotfiles
-- **Update quarterly** during your [[Template — Weekly Tools Review|weekly tools review]]
-- **Test on a fresh account** occasionally (macOS guest user) to make sure it still works
+- **Store this script** in your dotfiles repo alongside your config files
+- **Update the date** at the top when you change tool versions or add new tools
+- **Audit quarterly** during your [[Template — Weekly Tools Review|weekly tools review]]
 
 ---
 
