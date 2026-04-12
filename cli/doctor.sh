@@ -16,6 +16,13 @@ cmd_doctor() {
   local failed=0
   local skipped=0
 
+  if [ ! -d ".git" ]; then
+    echo ""
+    echo -e "  ${RED}Not a git repository.${NC} Run nexus doctor from inside a project."
+    echo ""
+    return 1
+  fi
+
   print_header "nexus doctor"
 
   # ── 1. CLAUDE.md file structure sync ────────────────────────────

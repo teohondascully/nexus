@@ -8,6 +8,9 @@
     ],
     "onStop": [
       {
+        "command": "bun scripts/check-deps-direction.ts 2>/dev/null || true"
+      },
+      {
         "command": "nexus doctor --quick 2>/dev/null || true"
       }
     ]

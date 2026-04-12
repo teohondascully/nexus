@@ -4,8 +4,17 @@
 cmd_update() {
   print_header "nexus update"
 
+  # ── 0. Check vault exists ─────────────────────────────────────────
+  if [ ! -d "$HOME/.nexus" ]; then
+    echo -e "  ${RED}~/.nexus not found.${NC} Install first:"
+    echo -e "  curl -fsSL https://www.teonnaise.com/install | bash"
+    echo ""
+    return 1
+  fi
+
   # ── 1. Pull latest vault ──────────────────────────────────────────
   if [ -d "$HOME/.nexus/.git" ]; then
+    echo -e "  Pulling latest..."
     if ! git -C "$HOME/.nexus" pull --ff-only --quiet 2>/dev/null; then
       print_warn "Could not pull latest vault (not fast-forward or no network)"
     fi

@@ -62,13 +62,13 @@ cmd_init() {
     read auth_ans || true
     [ "${auth_ans:-y}" = "n" ] || [ "${auth_ans:-y}" = "N" ] && want_auth=false
 
-    echo -e "  API style?"
-    echo -e "    ${BOLD}1${NC}  tRPC (default)"
-    echo -e "    ${BOLD}2${NC}  REST"
-    echo -e "    ${BOLD}3${NC}  Skip"
-    printf "  [1/2/3]: "
-    read api_choice || true
-    api_choice="${api_choice:-1}"
+    printf "  API (tRPC)? [Y/n]: "
+    read api_ans || true
+    if [ "${api_ans:-y}" = "n" ] || [ "${api_ans:-y}" = "N" ]; then
+      api_choice="3"
+    else
+      api_choice="1"
+    fi
 
     printf "  CI? [Y/n]: "
     read ci_ans || true

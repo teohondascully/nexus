@@ -1,13 +1,14 @@
-import { publicProcedure, router } from "./trpc";
-import { sql } from "drizzle-orm";
-import { db } from "../db/client";
+import { publicProcedure, router } from "../trpc";
 
 export const healthRouter = router({
   check: publicProcedure.query(async () => {
     let dbStatus: "connected" | "unreachable" = "unreachable";
 
     try {
-      await db.execute(sql`SELECT 1`);
+      const pg = await import("postgres");
+      const sql = pg.default(process.env.DATABASE_URL!);
+      await sql`SELECT 1`;
+      await sql.end();
       dbStatus = "connected";
     } catch {
       dbStatus = "unreachable";

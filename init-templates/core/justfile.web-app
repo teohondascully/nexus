@@ -1,4 +1,5 @@
 # justfile — web app
+# Run with: just <command>
 
 set dotenv-load := true
 
@@ -23,29 +24,35 @@ typecheck:
 lint:
     pnpm lint
 
+# ── Database ─────────────────────────────────────────────
 # Run pending DB migrations
 db-migrate:
     pnpm drizzle-kit migrate
 
 # Seed the database
 db-seed:
-    pnpm tsx scripts/seed.ts
+    bun packages/db/seed.ts
 
 # Drop and recreate the DB, then migrate and seed
 db-reset:
-    pnpm tsx scripts/db-reset.ts
+    docker compose down -v
+    docker compose up -d
+    sleep 2
+    just db-migrate
+    just db-seed
 
 # Open Drizzle Studio
 db-studio:
     pnpm drizzle-kit studio
 
-# Check that all required tools and env vars are present
+# ── Quality ──────────────────────────────────────────────
+# Run nexus doctor (all maintenance checks)
 doctor:
-    pnpm tsx scripts/doctor.ts
+    nexus doctor
 
-# Auto-fix common doctor issues
+# Auto-fix doctor issues
 doctor-fix:
-    pnpm tsx scripts/doctor-fix.ts
+    nexus doctor --fix
 
 # Show outdated dependencies
 outdated:
@@ -53,8 +60,8 @@ outdated:
 
 # Find dead (unused) exports
 dead-code:
-    pnpm tsx scripts/find-dead-code.ts
+    bun scripts/check-dead-exports.ts
 
-# Run security audit
+# Run all quality checks
 audit:
-    pnpm audit
+    just doctor && just outdated && just dead-code

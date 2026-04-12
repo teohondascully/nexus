@@ -13,7 +13,7 @@ cmd_add_db() {
 
   append_to_file ".env.example" "DATABASE_URL" "
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/myapp
+DATABASE_URL=postgresql://dev:dev@localhost:5432/myproject
 REDIS_URL=redis://localhost:6379" || true
 
   append_to_file "justfile" "db-migrate" "
@@ -21,14 +21,18 @@ REDIS_URL=redis://localhost:6379" || true
 db-migrate:
     pnpm drizzle-kit migrate
 
-db-push:
-    pnpm drizzle-kit push
+db-seed:
+    bun packages/db/seed.ts
+
+db-reset:
+    docker compose down -v
+    docker compose up -d
+    sleep 2
+    just db-migrate
+    just db-seed
 
 db-studio:
-    pnpm drizzle-kit studio
-
-db-seed:
-    bun packages/db/seed.ts" || true
+    pnpm drizzle-kit studio" || true
 
   check_prereq docker "Install Docker: https://docs.docker.com/get-docker/" || true
 
