@@ -1,6 +1,6 @@
 # nexus
 
-One-command dev environment + automated project infrastructure for macOS.
+One-command dev environment + invisible project infrastructure for any language.
 
 ```bash
 curl -fsSL https://www.teonnaise.com/install | bash
@@ -26,7 +26,7 @@ Before installing anything, press `i` at the welcome screen to see the full list
 
 ## The nexus CLI
 
-After installing, `nexus` is available from any directory. It's a project infrastructure system:
+After installing, `nexus` is available from any directory. It's a language-aware project infrastructure system — detects your ecosystem and drops only what applies. Scripts run from `~/.nexus/`, so your repo stays clean.
 
 ```
 nexus                   Runs doctor (default)
@@ -41,38 +41,35 @@ nexus uninstall         Remove nexus
 
 ### `nexus init`
 
-Zero questions. Drops self-maintaining infrastructure into your project:
+Auto-detects your ecosystem (Node, Go, Python, Rust, or generic) and drops only what applies. No scripts in your repo — enforcement runs from `~/.nexus/`:
 
-- **CLAUDE.md** with dependency direction, file structure (auto-synced), and conventions
-- **justfile** with standard commands (dev, test, build, doctor, etc.)
-- **Maintenance scripts** &mdash; env var sync, dependency direction linter, dead export detection, CLAUDE.md file-tree sync, startup validation
-- **lefthook** pre-commit hooks (typecheck, lint, env sync, dep direction)
-- **Claude Code hooks** (file-tree sync on write, doctor on stop)
+- **CLAUDE.md** with universal conventions (Node projects get additional Node-specific rules)
+- **justfile** with doctor commands — no placeholders, no "Configure: replace this"
+- **lefthook** pre-commit hooks scoped to your detected ecosystem
+- **Claude Code hooks** (session-sync at start/stop via `~/.nexus/scripts/session-sync.sh`)
+- **.nexus/context.md** — auto-maintained living context file for fresh AI agents
 - **.gitignore**, **.env.example**, **.mise.toml**, **PR template**
+- **Git remote hint** when no remote is detected
 
 ### `nexus doctor`
 
-Runs 7 checks and reports a scorecard with a recommendations tier:
+Detects your ecosystem and runs only the checks that apply. No "skip" noise for irrelevant tools:
 
 ```
   nexus doctor
 
+  Ecosystem: Go
+
   ok    CLAUDE.md file structure
   ok    .env.example coverage
-  FAIL  Dependency direction (1 violation)
-          src/components/OrderList.tsx imports from src/services/orders.ts
-  ok    Hallucinated imports
-  ok    Dead exports
-  ok    Orphaned files
-  ok    Nexus v1.1.0
+  ok    Nexus v2.1.0
 
-  6/7 passed  1 failed
+  3/3 passed
 
   Recommendations
-   ~  No test runner. Run: pnpm add -D vitest
-   ~  TypeScript strict mode is off
+   ~  No .nexus/context.md found. Run: nexus init
 
-  2 recommendations
+  1 recommendation
 ```
 
 ### `nexus update`
@@ -84,17 +81,27 @@ Syncs your project's infrastructure against the latest templates. Handles sectio
 The vault is the brain. Nexus compiles it into machine-enforceable artifacts. AI agents only see artifacts, not the vault.
 
 1. **Vault** — 50+ Obsidian notes encoding architecture patterns, conventions, and stack decisions
-2. **Artifacts** — `nexus init` compiles the vault into CLAUDE.md, justfile, scripts, and hook configs
-3. **Hooks** — three enforcement layers run continuously during development
+2. **Artifacts** — `nexus init` detects your ecosystem and drops only what applies — no irrelevant hooks, no placeholder scripts
+3. **Hooks** — enforcement layers fire at commit time and session boundaries
 4. **Enforcement** — violations surface at commit time, not review time
 
 ### Hook system
 
-Three enforcement layers work together:
+Two enforcement layers work together:
 
-- **lefthook pre-commit** — typecheck, lint, env var sync, dependency direction on every commit
-- **Claude Code hooks** — file-tree sync on write, `nexus doctor --quick` on session stop
+- **lefthook pre-commit** — checks scoped to your ecosystem (Node: typecheck, lint, env sync, dep direction; Go/Rust/Python: subset that applies)
+- **Claude Code hooks** — `session-sync.sh` runs at session start and stop, keeping `.nexus/context.md` current so fresh agents immediately know your stack
 - **justfile** — `just doctor` runs the full check suite on demand
+
+### What gets dropped per ecosystem
+
+| Ecosystem | CLAUDE.md | lefthook hooks | Extra checks |
+|-----------|-----------|----------------|--------------|
+| **Node** | Universal + Node conventions | typecheck, lint, env sync, dep direction | hallucinated imports, dead exports |
+| **Go** | Universal only | vet, fmt check | — |
+| **Python** | Universal only | ruff, uv sync check | — |
+| **Rust** | Universal only | clippy, fmt check | — |
+| **Generic** | Universal only | — | env coverage |
 
 ### Updating nexus
 
@@ -127,12 +134,15 @@ The vault separates **foundations** (patterns that don't change) from **tools** 
 
 ## File structure
 
+What lives in `~/.nexus/` (the nexus install):
+
 ```
-nexus/
+~/.nexus/
 ├── nexus                     # CLI entry point
 ├── cli/                      # init, doctor, update, helpers
-├── templates/                # files dropped into projects by nexus init
-├── scripts/                  # maintenance scripts dropped into projects
+├── templates/                # base templates per ecosystem
+├── scripts/                  # maintenance scripts (run from here, not copied)
+│   └── session-sync.sh       # syncs .nexus/context.md at session start/stop
 ├── vault/                    # Obsidian knowledge vault (50+ notes)
 │   ├── HOME.md               # vault entry point
 │   ├── foundations/          # architecture, design principles
@@ -143,6 +153,21 @@ nexus/
 ├── install.sh                # curl|bash entry point
 ├── VERSION
 └── CHANGELOG.md
+```
+
+What `nexus init` drops into your project:
+
+```
+your-project/
+├── CLAUDE.md                 # conventions for this project (universal + ecosystem-specific)
+├── lefthook.yml              # pre-commit hooks scoped to detected ecosystem
+├── justfile                  # doctor commands
+├── .gitignore
+├── .env.example
+├── .mise.toml
+├── .github/pull_request_template.md
+└── .nexus/
+    └── context.md            # living context: stack, structure, health (auto-maintained)
 ```
 
 ## License

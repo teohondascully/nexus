@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-04-12 — Nexus v2.1.0: Language-Agnostic Invisible Infrastructure
+**Agent:** Claude Code (Opus 4.6, 1M context)
+**Trigger:** Manual — v2.1 evolution
+
+### What Changed
+- **Zero-footprint:** Scripts no longer copied into projects. Run from `~/.nexus/scripts/`. User repos see only CLAUDE.md, hooks, and config.
+- **Smart detection:** Auto-detects Node, Go, Python, Rust from project files. Only runs checks that apply. No "skip" output for irrelevant checks.
+- **Living context:** `.nexus/context.md` auto-maintained at session start/stop. Fresh AI agents immediately know the stack, structure, and health.
+- **Universal CLAUDE.md:** Conventions trimmed to universal rules. Node-specific conventions added only when Node detected.
+- **Adaptive hooks:** lefthook.yml only contains hooks relevant to the detected ecosystem.
+- **Git remote hint:** Init shows how to connect to GitHub when no remote detected.
+- **No more placeholders:** Justfile only has doctor commands. No "Configure: replace this" messages.
+
+### Files Modified
+`cli/helpers.sh`, `cli/init.sh`, `cli/doctor.sh`, `cli/update.sh`, `scripts/session-sync.sh` (new), `scripts/check-env-sync.sh`, `templates/CLAUDE.md`, `templates/CLAUDE.md.node` (new), `templates/lefthook.yml`, `templates/lefthook.yml.node` (new), `templates/claude-settings.json`, `templates/gitignore`, `templates/justfile`, `VERSION`, `CHANGELOG.md`, `README.md`
+
+---
+
 ## 2026-04-12 — Nexus v2.0.0: Automated Project Infrastructure
 **Agent:** Claude Code (Opus 4.6, 1M context)
 **Trigger:** Manual — full v2 rewrite
