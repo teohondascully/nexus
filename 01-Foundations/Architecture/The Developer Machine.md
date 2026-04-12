@@ -164,8 +164,8 @@ alias grep="rg"
 alias find="fd"
 alias lg="lazygit"
 
-# Zoxide (smart cd)
-eval "$(zoxide init zsh)"
+# Zoxide (smart cd — works as normal cd too)
+eval "$(zoxide init zsh --cmd cd)"
 
 # fzf (fuzzy finder)
 source <(fzf --zsh)

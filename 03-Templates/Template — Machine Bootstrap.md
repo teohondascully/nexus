@@ -253,6 +253,26 @@ step "mise — Version Manager" "One tool for all runtimes (Node, Python, Go, et
 
 brew_install "mise" "polyglot version manager — manages runtimes, env vars, tasks"
 
+# Write a global mise config if one doesn't exist
+if [ ! -f ~/.config/mise/config.toml ]; then
+  mkdir -p ~/.config/mise
+  cat > ~/.config/mise/config.toml << 'MISE'
+# Global mise config — tool versions used when no project .mise.toml exists
+# Override per-project by creating .mise.toml in the project root.
+
+[tools]
+node = "24"
+python = "3.12"
+
+[settings]
+# Automatically install missing tools when cd'ing into a project
+auto_install = true
+MISE
+  installed "mise global config" "node@24, python@3.12, auto_install"
+else
+  skipped "mise global config"
+fi
+
 # ═════════════════════════════════════════════════════════════════
 # STEP 7: JavaScript Runtimes + Packages
 # ═════════════════════════════════════════════════════════════════
@@ -438,6 +458,7 @@ alias api="http localhost:3000/api"
 alias apih="http localhost:3000/api/health"
 alias json="jq ."
 alias jsonkeys="jq 'keys'"
+alias jsonflat="jq '[paths(scalars)]'"
 alias dev="cd ~/dev"
 
 # ── Functions ────────────────────────────────────────────────
