@@ -6,7 +6,14 @@
 # ================================================================
 
 # ── Config ───────────────────────────────────────────────────────
-VAULT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Resolve through symlinks to find the real vault location
+SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SOURCE" ]; do
+  DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+VAULT_DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
 TEMPLATES="$VAULT_DIR/03-Templates"
 TOOLS="$VAULT_DIR/02-Tools-and-Meta"
 FOUNDATIONS="$VAULT_DIR/01-Foundations"
