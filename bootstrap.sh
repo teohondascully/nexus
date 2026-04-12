@@ -298,6 +298,7 @@ brew_install "btop"        "beautiful system monitor — CPU, memory, disk, netw
 brew_install "dust"        "disk usage analyzer — visual, sorted, fast"
 brew_install "dive"        "Docker image layer inspector — find bloat"
 brew_install "gh"          "GitHub CLI — create PRs, check CI, manage issues from terminal"
+brew_install "lefthook"    "git hooks manager — runs pre-commit checks"
 brew_install "just"        "modern command runner — replaces Makefiles with simpler syntax"
 
 # Raycast (optional — replaces Spotlight, Rectangle, clipboard managers)
