@@ -26,6 +26,27 @@ VAULT_DIR="$(resolve_vault_dir)"
 TEMPLATES="$VAULT_DIR/templates"
 SCRIPTS="$VAULT_DIR/scripts"
 
+# ── Ecosystem Detection ─────────────────────────────────────────
+detect_ecosystem() {
+  if [ -f "package.json" ]; then
+    echo "node"
+  elif [ -f "go.mod" ]; then
+    echo "go"
+  elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+    echo "python"
+  elif [ -f "Cargo.toml" ]; then
+    echo "rust"
+  else
+    echo "generic"
+  fi
+}
+
+# Checks if any existing build system is present
+has_build_system() {
+  [ -f "Makefile" ] || [ -f "taskfile.yml" ] || [ -f "justfile" ] || \
+  [ -f "Rakefile" ] || [ -f "build.gradle" ] || [ -f "pom.xml" ]
+}
+
 # ── Prereq Checks ───────────────────────────────────────────────
 has_cmd() {
   command -v "$1" &> /dev/null
@@ -94,7 +115,7 @@ drop_file() {
       read -n 1 -r choice
       echo ""
       case $choice in
-        [oO]) cp "$src" "$dest"; update_checksum "$dest"; echo -e "  ${GREEN}overwrote${NC} $basename"; return 0 ;;
+        [oO]) cp "$src" "$dest"; echo -e "  ${GREEN}overwrote${NC} $basename"; return 0 ;;
         [sS]) echo -e "  ${DIM}skipped${NC} $basename"; return 1 ;;
         [dD]) diff --color=always "$dest" "$src" | head -40; echo ""; ;;
         *) echo "  o/s/d?" ;;
@@ -102,42 +123,9 @@ drop_file() {
     done
   else
     cp "$src" "$dest"
-    update_checksum "$dest"
     echo -e "  ${GREEN}created${NC} $(basename "$dest")"
     return 0
   fi
-}
-
-# ── Checksum Tracking ────────────────────────────────────────────
-CHECKSUM_FILE=".nexus-checksums"
-
-update_checksum() {
-  local file="$1"
-  local hash
-  hash=$(md5 -q "$file" 2>/dev/null || md5sum "$file" | cut -d' ' -f1)
-  local rel_path="$file"
-
-  if [ -f "$CHECKSUM_FILE" ]; then
-    grep -v "^$rel_path " "$CHECKSUM_FILE" > "$CHECKSUM_FILE.tmp" 2>/dev/null || true
-    mv "$CHECKSUM_FILE.tmp" "$CHECKSUM_FILE"
-  fi
-
-  echo "$rel_path $hash" >> "$CHECKSUM_FILE"
-}
-
-is_customized() {
-  local file="$1"
-  if [ ! -f "$CHECKSUM_FILE" ]; then
-    return 0
-  fi
-  local stored_hash
-  stored_hash=$(grep "^$file " "$CHECKSUM_FILE" 2>/dev/null | awk '{print $2}')
-  if [ -z "$stored_hash" ]; then
-    return 0
-  fi
-  local current_hash
-  current_hash=$(md5 -q "$file" 2>/dev/null || md5sum "$file" | cut -d' ' -f1)
-  [ "$stored_hash" != "$current_hash" ]
 }
 
 # ── Append with Marker ───────────────────────────────────────────
@@ -154,8 +142,8 @@ append_to_file() {
   return 0
 }
 
-# ── Silent File Drop (for init — no interactive prompt) ──────────
-drop_file_silent() {
+# ── File Drop (silent skip if exists) ────────────────────────────
+drop_template() {
   local src="$1"
   local dest="$2"
   mkdir -p "$(dirname "$dest")"
@@ -166,7 +154,6 @@ drop_file_silent() {
   fi
 
   cp "$src" "$dest"
-  update_checksum "$dest"
   echo -e "  ${GREEN}created${NC} $(basename "$dest")"
   return 0
 }
