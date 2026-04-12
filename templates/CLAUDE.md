@@ -1,15 +1,15 @@
 # CLAUDE.md
 
 ## Project Overview
-<!-- This is yours — describe your app, who it's for, what the core loop is -->
+<!-- Auto-populated as the project grows -->
 
 ## Tech Stack
-<!-- This is yours — list your specific stack here -->
+<!-- Detected from package.json, configs, and imports -->
 
 ## Architecture Rules
 
 ### Dependency Direction
-<!-- This is yours — define your chain. Example: -->
+<!-- Define your layer chain when ready. Example: -->
 <!-- Types → Config → Repo → Service → Runtime → UI -->
 <!-- Enforced by scripts/check-deps-direction.ts on every commit -->
 
