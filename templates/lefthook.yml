@@ -5,12 +5,6 @@ pre-commit:
   parallel: true
   commands:
     env-sync:
-      run: bash scripts/check-env-sync.sh
-    deps-direction:
-      run: "[ -f scripts/check-deps-direction.ts ] && bun scripts/check-deps-direction.ts || true"
-    hallucinated-imports:
-      run: "[ -f scripts/check-hallucinated-imports.ts ] && bun scripts/check-hallucinated-imports.ts || true"
-    typecheck:
-      run: "[ -f package.json ] && pnpm typecheck || true"
-    lint:
-      run: "[ -f package.json ] && pnpm lint || true"
+      run: bash ~/.nexus/scripts/check-env-sync.sh
+    claude-md-sync:
+      run: bash ~/.nexus/scripts/sync-claude-md.sh

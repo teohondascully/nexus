@@ -20,23 +20,47 @@ while IFS= read -r line; do
   [[ -n "$varname" ]] && declared+=("$varname")
 done < "$ENV_EXAMPLE"
 
-# Grep for process.env.VAR and Bun.env.VAR in source files
-# Excludes node_modules, .next, dist
+# Detect env var pattern based on ecosystem
+if [ -f "package.json" ]; then
+  PATTERN='(process\.env|Bun\.env)\.[A-Z_][A-Z0-9_]*'
+  STRIP='s/(process\.env|Bun\.env)\.//'
+  INCLUDES='--include=*.ts --include=*.tsx --include=*.js --include=*.jsx'
+elif [ -f "go.mod" ]; then
+  PATTERN='os\.Getenv\("[A-Z_][A-Z0-9_]*"\)'
+  STRIP='s/os\.Getenv\("//;s/"\)//'
+  INCLUDES='--include=*.go'
+elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+  PATTERN='os\.environ\[?"[A-Z_][A-Z0-9_]*"\]?|os\.getenv\("[A-Z_][A-Z0-9_]*"\)'
+  STRIP='s/os\.environ\[?"//;s/"\]?//;s/os\.getenv\("//;s/"\)//'
+  INCLUDES='--include=*.py'
+elif [ -f "Cargo.toml" ]; then
+  PATTERN='std::env::var\("[A-Z_][A-Z0-9_]*"\)'
+  STRIP='s/std::env::var\("//;s/"\)//'
+  INCLUDES='--include=*.rs'
+else
+  # No ecosystem detected, nothing to check
+  exit 0
+fi
+
+# Grep for env var references in source files
 used_raw=$(
-  grep -rh \
-    --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
-    -E "(process\.env|Bun\.env)\.[A-Z_][A-Z0-9_]*" \
+  eval grep -rEh $INCLUDES \
     --exclude-dir=node_modules \
     --exclude-dir=.next \
     --exclude-dir=dist \
+    --exclude-dir=target \
+    --exclude-dir=__pycache__ \
+    --exclude-dir=.venv \
+    --exclude-dir=vendor \
+    "'$PATTERN'" \
     . 2>/dev/null || true
 )
 
 # Extract just the variable names
 used_vars=$(
   printf '%s\n' "$used_raw" \
-  | grep -oE "(process\.env|Bun\.env)\.[A-Z_][A-Z0-9_]*" \
-  | sed -E 's/(process\.env|Bun\.env)\.//' \
+  | grep -oE "$PATTERN" \
+  | sed -E "$STRIP" \
   | sort -u \
   || true
 )

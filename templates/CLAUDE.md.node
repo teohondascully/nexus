@@ -1,0 +1,8 @@
+<!-- nexus:conventions-node -->
+## Node Conventions
+- All API responses follow: `{ data, error, metadata }`
+- All errors follow: `{ code, message, details }`
+- All database tables have: `id`, `created_at`, `updated_at`, `deleted_at`
+- No `any` types. No `@ts-ignore`. No `eslint-disable` without a comment explaining why.
+- No direct database calls outside repositories.
+<!-- nexus:end -->

@@ -1,8 +1,7 @@
 #!/bin/bash
-# cli/init.sh — nexus init (zero questions)
+# cli/init.sh — nexus init (zero-footprint, detection-aware)
 
 cmd_init() {
-  # Disable set -e — drop_file_silent returns 1 on skip, which is expected
   set +e
 
   check_git
@@ -28,33 +27,46 @@ cmd_init() {
   echo -e "  ${BOLD}nexus init${NC}"
   echo ""
 
+  # ── Detect ecosystem ────────────────────────────────────────────
+  local eco
+  eco=$(detect_ecosystem)
+
   # ── Drop templates ──────────────────────────────────────────────
-  drop_file_silent "$TEMPLATES/CLAUDE.md" "CLAUDE.md"
-  drop_file_silent "$TEMPLATES/justfile" "justfile"
-  drop_file_silent "$TEMPLATES/gitignore" ".gitignore"
-  drop_file_silent "$TEMPLATES/env.example" ".env.example"
-  drop_file_silent "$TEMPLATES/mise.toml" ".mise.toml"
+  drop_template "$TEMPLATES/CLAUDE.md" "CLAUDE.md"
+
+  # Append Node conventions if detected
+  if [ "$eco" = "node" ] && [ -f "CLAUDE.md" ] && [ -f "$TEMPLATES/CLAUDE.md.node" ]; then
+    if ! grep -q "nexus:conventions-node" "CLAUDE.md" 2>/dev/null; then
+      printf "\n" >> "CLAUDE.md"
+      cat "$TEMPLATES/CLAUDE.md.node" >> "CLAUDE.md"
+      echo -e "  ${GREEN}added${NC} Node conventions"
+    fi
+  fi
+
+  drop_template "$TEMPLATES/gitignore" ".gitignore"
+  drop_template "$TEMPLATES/env.example" ".env.example"
+  drop_template "$TEMPLATES/mise.toml" ".mise.toml"
 
   mkdir -p .github
-  drop_file_silent "$TEMPLATES/pr-template.md" ".github/pull_request_template.md"
-
-  # ── Drop scripts ────────────────────────────────────────────────
-  mkdir -p scripts
-  for script in sync-claude-md.sh check-env-sync.sh check-deps-direction.ts check-dead-exports.ts check-hallucinated-imports.ts check-orphaned-files.ts validate-startup.sh; do
-    if [ -f "$SCRIPTS/$script" ]; then
-      drop_file_silent "$SCRIPTS/$script" "scripts/$script"
-    fi
-  done
-  chmod +x scripts/*.sh scripts/*.ts 2>/dev/null || true
+  drop_template "$TEMPLATES/pr-template.md" ".github/pull_request_template.md"
 
   # ── Drop hooks ──────────────────────────────────────────────────
-  drop_file_silent "$TEMPLATES/lefthook.yml" "lefthook.yml"
+
+  # Lefthook — universal base, append Node hooks if detected
+  if [ ! -f "lefthook.yml" ]; then
+    cp "$TEMPLATES/lefthook.yml" "lefthook.yml"
+    if [ "$eco" = "node" ] && [ -f "$TEMPLATES/lefthook.yml.node" ]; then
+      cat "$TEMPLATES/lefthook.yml.node" >> "lefthook.yml"
+    fi
+    echo -e "  ${GREEN}created${NC} lefthook.yml"
+  else
+    print_skip "lefthook.yml (already exists)"
+  fi
 
   # Claude Code hooks — strip onStop if Superpowers detected
   if [ ! -f ".claude/settings.json" ]; then
     mkdir -p .claude
     if [ -d "$HOME/.claude/plugins" ] && ls "$HOME/.claude/plugins" 2>/dev/null | grep -q superpowers; then
-      # Strip onStop block — Superpowers handles it
       python3 -c "
 import sys, json
 with open(sys.argv[1]) as f:
@@ -68,23 +80,34 @@ json.dump(data, sys.stdout, indent=2)
       cp "$TEMPLATES/claude-settings.json" .claude/settings.json
       echo -e "  ${GREEN}created${NC} settings.json"
     fi
-    update_checksum ".claude/settings.json"
   else
     print_skip "settings.json (already exists)"
   fi
 
+  # Justfile — only if no build system exists
+  if ! has_build_system; then
+    drop_template "$TEMPLATES/justfile" "justfile"
+  fi
+
   # ── Post-setup ──────────────────────────────────────────────────
 
-  # Add .nexus-checksums and .nexus-version to gitignore
-  append_to_file ".gitignore" ".nexus-checksums" ".nexus-checksums" > /dev/null 2>&1 || true
+  # Ensure .nexus/ and .nexus-version are gitignored
+  append_to_file ".gitignore" ".nexus/" ".nexus/" > /dev/null 2>&1 || true
   append_to_file ".gitignore" ".nexus-version" ".nexus-version" > /dev/null 2>&1 || true
 
   # Stamp version
   cp "$NEXUS_DIR/VERSION" ".nexus-version"
 
+  # Create .nexus/ and run session sync to populate context
+  mkdir -p .nexus
+  if [ -f "$NEXUS_DIR/scripts/session-sync.sh" ]; then
+    bash "$NEXUS_DIR/scripts/session-sync.sh" 2>/dev/null || true
+    echo -e "  ${GREEN}synced${NC} project context"
+  fi
+
   # Sync CLAUDE.md file structure
-  if [ -f "scripts/sync-claude-md.sh" ] && [ -f "CLAUDE.md" ]; then
-    bash scripts/sync-claude-md.sh 2>/dev/null && echo -e "  ${GREEN}synced${NC} CLAUDE.md file structure" || true
+  if [ -f "CLAUDE.md" ] && [ -f "$NEXUS_DIR/scripts/sync-claude-md.sh" ]; then
+    bash "$NEXUS_DIR/scripts/sync-claude-md.sh" > /dev/null 2>&1 && echo -e "  ${GREEN}synced${NC} CLAUDE.md file structure" || true
   fi
 
   # Trust mise config if available
@@ -97,7 +120,32 @@ json.dump(data, sys.stdout, indent=2)
     lefthook install > /dev/null 2>&1 && echo -e "  ${GREEN}activated${NC} pre-commit hooks" || true
   fi
 
-  # ── Summary ─────────────────────────────────────────────────────
+  # ── Detection summary ──────────────────────────────────────────
+  echo ""
+  case "$eco" in
+    node)
+      local fw=""
+      if [ -f "package.json" ]; then
+        for f in next express hono fastify remix svelte astro nuxt; do
+          if grep -q "\"$f\"" package.json 2>/dev/null; then
+            fw="$f"
+            break
+          fi
+        done
+      fi
+      if [ -n "$fw" ]; then
+        echo -e "  ${BOLD}Detected:${NC} Node (${fw})"
+      else
+        echo -e "  ${BOLD}Detected:${NC} Node"
+      fi
+      ;;
+    go)     echo -e "  ${BOLD}Detected:${NC} Go" ;;
+    python) echo -e "  ${BOLD}Detected:${NC} Python" ;;
+    rust)   echo -e "  ${BOLD}Detected:${NC} Rust" ;;
+    *)      echo -e "  ${BOLD}Detected:${NC} Generic project" ;;
+  esac
+
+  # ── Commit ─────────────────────────────────────────────────────
   echo ""
   printf "  Commit? [Y/n]: "
   read -r commit_ans < /dev/tty || true
@@ -107,26 +155,38 @@ json.dump(data, sys.stdout, indent=2)
     echo -e "  ${GREEN}committed${NC}"
   fi
 
+  # ── Summary ─────────────────────────────────────────────────────
   echo ""
-  echo -e "  ${BOLD}Done.${NC} Your project now has invisible guardrails."
-  echo ""
-  echo -e "  ${BOLD}What's active${NC}"
+  echo -e "  ${BOLD}Your project has invisible guardrails.${NC}"
   echo ""
   echo -e "  ${GREEN}On every commit${NC} ${DIM}(lefthook pre-commit)${NC}"
-  echo -e "    Env vars in code match .env.example"
-  echo -e "    Import direction follows your dependency chain"
-  echo -e "    No packages imported that aren't in package.json"
-  echo -e "    Typecheck and lint pass"
+  if [ "$eco" = "node" ]; then
+    echo -e "    Env vars in code match .env.example"
+    echo -e "    Import direction follows your dependency chain"
+    echo -e "    No packages imported that aren't in package.json"
+    echo -e "    Typecheck and lint pass"
+  elif [ "$eco" = "generic" ]; then
+    echo -e "    CLAUDE.md file structure is accurate"
+  else
+    echo -e "    Env vars in code match .env.example"
+    echo -e "    CLAUDE.md file structure is accurate"
+  fi
   echo ""
   echo -e "  ${GREEN}While AI agents code${NC} ${DIM}(Claude Code hooks)${NC}"
-  echo -e "    CLAUDE.md file structure auto-syncs on every file write"
-  echo -e "    Doctor runs on stop to catch drift"
+  echo -e "    Project context stays fresh across sessions"
+  echo -e "    Doctor catches drift on session end"
   echo ""
   echo -e "  ${GREEN}On demand${NC}"
-  echo -e "    ${DIM}nexus${NC}            Check project health + recommendations"
-  echo -e "    ${DIM}nexus doctor --fix${NC} Auto-repair what it can"
-  echo -e "    ${DIM}nexus update${NC}      Pull latest conventions from nexus"
+  echo -e "    ${DIM}nexus${NC}               Check project health"
+  echo -e "    ${DIM}nexus doctor --fix${NC}   Auto-repair what it can"
+  echo -e "    ${DIM}nexus update${NC}         Pull latest conventions"
   echo ""
-  echo -e "  ${DIM}CLAUDE.md adapts as your project grows. Just build.${NC}"
-  echo ""
+
+  # ── Git remote hint ─────────────────────────────────────────────
+  if ! git remote get-url origin > /dev/null 2>&1; then
+    echo -e "  ${DIM}No remote detected. To connect to GitHub:${NC}"
+    echo -e "    ${DIM}gh repo create <name> --private --source .${NC}"
+    echo -e "    ${DIM}git push -u origin main${NC}"
+    echo ""
+  fi
 }

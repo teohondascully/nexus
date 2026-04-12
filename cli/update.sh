@@ -1,5 +1,5 @@
 #!/bin/bash
-# cli/update.sh — nexus update with section-level CLAUDE.md migration
+# cli/update.sh — nexus update (simplified — scripts are global)
 
 cmd_update() {
   set +e
@@ -48,61 +48,23 @@ cmd_update() {
 
   local updates_available=false
 
-  # ── Script migration ───────────────────────────────────────────
-  echo -e "  ${BOLD}Scripts${NC}"
-  for script in sync-claude-md.sh check-env-sync.sh check-deps-direction.ts check-dead-exports.ts check-hallucinated-imports.ts check-orphaned-files.ts validate-startup.sh; do
-    local src="$SCRIPTS/$script"
-    local dest="scripts/$script"
-
-    if [ ! -f "$src" ]; then continue; fi
-
-    if [ ! -f "$dest" ]; then
-      echo -e "  ${CYAN}new${NC}   $script"
-      updates_available=true
-    elif is_customized "$dest"; then
-      echo -e "  ${DIM}skip${NC}  $script ${DIM}(customized)${NC}"
-    elif ! diff -q "$src" "$dest" > /dev/null 2>&1; then
-      echo -e "  ${YELLOW}up${NC}    $script"
-      updates_available=true
-    else
-      echo -e "  ${GREEN}ok${NC}    $script"
-    fi
-  done
-
-  # ── Hook migration ─────────────────────────────────────────────
-  for hook in lefthook.yml; do
-    local src="$TEMPLATES/$hook"
-    local dest="$hook"
-    if [ ! -f "$src" ] || [ ! -f "$dest" ]; then continue; fi
-
-    if is_customized "$dest"; then
-      echo -e "  ${DIM}skip${NC}  $hook ${DIM}(customized)${NC}"
-    elif ! diff -q "$src" "$dest" > /dev/null 2>&1; then
-      echo -e "  ${YELLOW}up${NC}    $hook"
-      updates_available=true
-    else
-      echo -e "  ${GREEN}ok${NC}    $hook"
-    fi
-  done
+  # ── Scripts (informational — they update globally) ──────────────
+  echo -e "  ${BOLD}Scripts${NC} ${DIM}(global — updated via git pull)${NC}"
+  echo -e "  ${GREEN}ok${NC}    All scripts updated to v${remote_ver}"
+  echo ""
 
   # ── CLAUDE.md section migration ────────────────────────────────
   if [ -f "CLAUDE.md" ] && [ -f "$TEMPLATES/CLAUDE.md" ]; then
-    echo ""
     echo -e "  ${BOLD}CLAUDE.md${NC}"
 
     local template="$TEMPLATES/CLAUDE.md"
-
-    # Get all nexus sections from template
     local template_sections
     template_sections=$(parse_nexus_sections "$template")
-
-    # Get all nexus sections from project
     local project_sections
     project_sections=$(parse_nexus_sections "CLAUDE.md")
 
     for section in $template_sections; do
       if echo "$project_sections" | grep -q "^${section}$"; then
-        # Section exists — compare content
         local template_content
         template_content=$(extract_section "$template" "$section")
         local project_content
@@ -115,34 +77,20 @@ cmd_update() {
           updates_available=true
         fi
       else
-        # New section
         echo -e "  ${CYAN}new${NC}   $section"
         updates_available=true
       fi
     done
 
-    # Show user-owned sections as skipped
-    # (anything in CLAUDE.md that's NOT between nexus markers)
-    grep '^## ' "CLAUDE.md" | while IFS= read -r header; do
-      local header_text="${header#\#\# }"
-      # Check if this header is inside a nexus section
-      local is_nexus=false
-      for section in $template_sections; do
-        local section_header
-        section_header=$(awk -v name="$section" '
-          $0 ~ "<!-- nexus:" name " -->" { found=1; next }
-          /<!-- nexus:end -->/ { found=0; next }
-          found && /^## / { print; exit }
-        ' "$template")
-        if [ "## $header_text" = "$section_header" ]; then
-          is_nexus=true
-          break
-        fi
-      done
-      if [ "$is_nexus" = false ]; then
-        echo -e "  ${DIM}skip${NC}  $header_text ${DIM}(yours)${NC}"
+    # Check for Node addon sections
+    local eco
+    eco=$(detect_ecosystem)
+    if [ "$eco" = "node" ] && [ -f "$TEMPLATES/CLAUDE.md.node" ]; then
+      if ! grep -q "nexus:conventions-node" "CLAUDE.md" 2>/dev/null; then
+        echo -e "  ${CYAN}new${NC}   conventions-node"
+        updates_available=true
       fi
-    done
+    fi
   fi
 
   if ! $updates_available; then
@@ -155,75 +103,12 @@ cmd_update() {
 
   # ── Apply ──────────────────────────────────────────────────────
   echo ""
-  printf "  Apply? [Y/n/diff]: "
+  printf "  Apply? [Y/n]: "
   read -r apply_choice < /dev/tty || true
 
   case "${apply_choice:-y}" in
-    [dD])
-      echo ""
-      # Show diffs for scripts
-      for script in sync-claude-md.sh check-env-sync.sh check-deps-direction.ts check-dead-exports.ts check-hallucinated-imports.ts check-orphaned-files.ts validate-startup.sh; do
-        local src="$SCRIPTS/$script"
-        local dest="scripts/$script"
-        if [ -f "$src" ] && [ -f "$dest" ] && ! is_customized "$dest" && ! diff -q "$src" "$dest" > /dev/null 2>&1; then
-          echo -e "  ${BOLD}--- $script ---${NC}"
-          diff --color=always "$dest" "$src" 2>/dev/null | head -20
-          echo ""
-        fi
-      done
-      # Show diffs for CLAUDE.md sections
-      if [ -f "CLAUDE.md" ] && [ -f "$TEMPLATES/CLAUDE.md" ]; then
-        for section in $(parse_nexus_sections "$TEMPLATES/CLAUDE.md"); do
-          if echo "$(parse_nexus_sections "CLAUDE.md")" | grep -q "^${section}$"; then
-            local t_content
-            t_content=$(extract_section "$TEMPLATES/CLAUDE.md" "$section")
-            local p_content
-            p_content=$(extract_section "CLAUDE.md" "$section")
-            if [ "$t_content" != "$p_content" ]; then
-              echo -e "  ${BOLD}--- CLAUDE.md:$section ---${NC}"
-              diff --color=always <(echo "$p_content") <(echo "$t_content") 2>/dev/null | head -20
-              echo ""
-            fi
-          fi
-        done
-      fi
-      printf "  Apply these? [Y/n]: "
-      read -r apply_final < /dev/tty || true
-      [[ "${apply_final:-y}" =~ ^[nN]$ ]] && return 0
-      ;;
     [nN]) return 0 ;;
   esac
-
-  # ── Apply scripts ──────────────────────────────────────────────
-  mkdir -p scripts
-  for script in sync-claude-md.sh check-env-sync.sh check-deps-direction.ts check-dead-exports.ts check-hallucinated-imports.ts check-orphaned-files.ts validate-startup.sh; do
-    local src="$SCRIPTS/$script"
-    local dest="scripts/$script"
-    if [ ! -f "$src" ]; then continue; fi
-
-    if [ ! -f "$dest" ]; then
-      cp "$src" "$dest"
-      chmod +x "$dest" 2>/dev/null || true
-      update_checksum "$dest"
-      echo -e "  ${GREEN}added${NC} $script"
-    elif ! is_customized "$dest" && ! diff -q "$src" "$dest" > /dev/null 2>&1; then
-      cp "$src" "$dest"
-      chmod +x "$dest" 2>/dev/null || true
-      update_checksum "$dest"
-      echo -e "  ${GREEN}updated${NC} $script"
-    fi
-  done
-
-  # ── Apply hook updates ─────────────────────────────────────────
-  for hook in lefthook.yml; do
-    local src="$TEMPLATES/$hook"
-    local dest="$hook"
-    if [ -f "$src" ] && [ -f "$dest" ] && ! is_customized "$dest" && ! diff -q "$src" "$dest" > /dev/null 2>&1; then
-      cp "$src" "$dest"
-      update_checksum "$dest"
-      echo -e "  ${GREEN}updated${NC} $hook"
-    fi
-  done
 
   # ── Apply CLAUDE.md section migration ──────────────────────────
   if [ -f "CLAUDE.md" ] && [ -f "$TEMPLATES/CLAUDE.md" ]; then
@@ -241,7 +126,6 @@ cmd_update() {
           echo -e "  ${GREEN}updated${NC} CLAUDE.md:$section"
         fi
       else
-        # New section — get full block from template (including header)
         local full_block
         full_block=$(awk -v name="$section" '
           $0 ~ "<!-- nexus:" name " -->" { found=1 }
@@ -252,6 +136,17 @@ cmd_update() {
         echo -e "  ${GREEN}added${NC} CLAUDE.md:$section"
       fi
     done
+
+    # Add Node addon if applicable
+    local eco
+    eco=$(detect_ecosystem)
+    if [ "$eco" = "node" ] && [ -f "$TEMPLATES/CLAUDE.md.node" ]; then
+      if ! grep -q "nexus:conventions-node" "CLAUDE.md" 2>/dev/null; then
+        printf "\n" >> "CLAUDE.md"
+        cat "$TEMPLATES/CLAUDE.md.node" >> "CLAUDE.md"
+        echo -e "  ${GREEN}added${NC} CLAUDE.md:conventions-node"
+      fi
+    fi
   fi
 
   # ── Stamp version ──────────────────────────────────────────────
