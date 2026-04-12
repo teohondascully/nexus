@@ -1,154 +1,108 @@
 #!/bin/bash
-# cli/init.sh — nexus init command
+# cli/init.sh — nexus init (zero questions)
 
 cmd_init() {
-  local project_name="${1:-}"
-  local is_existing=false
-  local orig_dir="$PWD"
-
   check_git
 
-  # ── Detect new vs existing ────────────────────────────────────────
-  if [ -n "$project_name" ]; then
-    if [ ! -d "$project_name" ]; then
-      mkdir -p "$project_name"
-      cd "$project_name"
+  # Detect or create project
+  if [ -n "${1:-}" ]; then
+    if [ ! -d "$1" ]; then
+      mkdir -p "$1"
+      cd "$1"
       git init --quiet
-      print_ok "Created $project_name and initialized git"
+      echo -e "  ${GREEN}created${NC} $1/"
     else
-      cd "$project_name"
-      is_existing=true
-      print_ok "Found existing directory: $project_name"
-    fi
-  else
-    if [ -d ".git" ]; then
-      is_existing=true
-      print_ok "Detected existing git repo"
-    else
-      git init --quiet
-      print_ok "Initialized git repo in current directory"
+      cd "$1"
     fi
   fi
 
-  print_header "nexus init"
+  if [ ! -d ".git" ]; then
+    git init --quiet
+    echo -e "  ${GREEN}initialized${NC} git"
+  fi
 
-  # ── Project type ──────────────────────────────────────────────────
-  echo -e "  What are you building?"
-  echo -e "    ${BOLD}1${NC}  Web app (Next.js + Postgres + the works)"
-  echo -e "    ${BOLD}2${NC}  Other (just give me the conventions)"
-  printf "  [1/2]: "
-  read project_type_choice || true
+  echo ""
+  echo -e "  ${BOLD}nexus init${NC}"
   echo ""
 
-  local project_type
-  if [ "${project_type_choice:-}" = "1" ]; then
-    project_type="web-app"
-  else
-    project_type="other"
-  fi
+  # ── Drop templates ──────────────────────────────────────────────
+  drop_file_silent "$TEMPLATES/CLAUDE.md" "CLAUDE.md"
+  drop_file_silent "$TEMPLATES/justfile" "justfile"
+  drop_file_silent "$TEMPLATES/gitignore" ".gitignore"
+  drop_file_silent "$TEMPLATES/env.example" ".env.example"
+  drop_file_silent "$TEMPLATES/mise.toml" ".mise.toml"
 
-  # ── Stack questions (web app only) ────────────────────────────────
-  local want_db=true
-  local want_auth=true
-  local api_choice="1"
-  local want_ci=true
+  mkdir -p .github
+  drop_file_silent "$TEMPLATES/pr-template.md" ".github/pull_request_template.md"
 
-  if [ "$project_type" = "web-app" ]; then
-    printf "  Database? [Y/n]: "
-    read db_ans || true
-    [ "${db_ans:-y}" = "n" ] || [ "${db_ans:-y}" = "N" ] && want_db=false
+  # ── Drop scripts ────────────────────────────────────────────────
+  mkdir -p scripts
+  for script in sync-claude-md.sh check-env-sync.sh check-deps-direction.ts check-dead-exports.ts check-hallucinated-imports.ts check-orphaned-files.ts validate-startup.sh; do
+    if [ -f "$SCRIPTS/$script" ]; then
+      drop_file_silent "$SCRIPTS/$script" "scripts/$script"
+    fi
+  done
+  chmod +x scripts/*.sh scripts/*.ts 2>/dev/null || true
 
-    printf "  Auth? [Y/n]: "
-    read auth_ans || true
-    [ "${auth_ans:-y}" = "n" ] || [ "${auth_ans:-y}" = "N" ] && want_auth=false
+  # ── Drop hooks ──────────────────────────────────────────────────
+  drop_file_silent "$TEMPLATES/lefthook.yml" "lefthook.yml"
 
-    printf "  API (tRPC)? [Y/n]: "
-    read api_ans || true
-    if [ "${api_ans:-y}" = "n" ] || [ "${api_ans:-y}" = "N" ]; then
-      api_choice="3"
+  # Claude Code hooks — strip onStop if Superpowers detected
+  if [ ! -f ".claude/settings.json" ]; then
+    mkdir -p .claude
+    if [ -d "$HOME/.claude/plugins" ] && ls "$HOME/.claude/plugins" 2>/dev/null | grep -q superpowers; then
+      # Strip onStop block — Superpowers handles it
+      grep -v '"onStop"' "$TEMPLATES/claude-settings.json" | \
+        grep -v 'nexus doctor' | \
+        grep -v '"command":' | \
+        python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+data.pop('hooks', {}).pop('onStop', None)
+# Rebuild clean
+out = {'hooks': {'PostToolUse': data.get('hooks', {}).get('PostToolUse', [])}}
+json.dump(out, sys.stdout, indent=2)
+" > .claude/settings.json 2>/dev/null || cp "$TEMPLATES/claude-settings.json" .claude/settings.json
+      echo -e "  ${GREEN}created${NC} settings.json ${DIM}(superpowers mode)${NC}"
     else
-      api_choice="1"
+      cp "$TEMPLATES/claude-settings.json" .claude/settings.json
+      echo -e "  ${GREEN}created${NC} settings.json"
     fi
-
-    printf "  CI? [Y/n]: "
-    read ci_ans || true
-    [ "${ci_ans:-y}" = "n" ] || [ "${ci_ans:-y}" = "N" ] && want_ci=false
-
-    echo ""
-  fi
-
-  # ── Drop core files ───────────────────────────────────────────────
-  print_header "Dropping core files"
-
-  drop_file "$TEMPLATES/core/CLAUDE.md.$project_type"          "CLAUDE.md"          || true
-  drop_file "$TEMPLATES/core/justfile.$project_type"           "justfile"           || true
-  drop_file "$TEMPLATES/core/gitignore"                        ".gitignore"         || true
-  drop_file "$TEMPLATES/core/env.example"                      ".env.example"       || true
-  drop_file "$TEMPLATES/core/mise.toml"                        ".mise.toml"         || true
-  drop_file "$TEMPLATES/core/pull_request_template.md"         ".github/pull_request_template.md" || true
-
-  # ── Run add commands ──────────────────────────────────────────────
-  if [ "$project_type" = "web-app" ]; then
-    echo ""
-    printf "  Set up everything based on your choices? [Y/n]: "
-    read setup_ans || true
-
-    if [ "${setup_ans:-y}" != "n" ] && [ "${setup_ans:-y}" != "N" ]; then
-      if [ "$want_db" = true ]; then
-        source "$NEXUS_DIR/cli/add-db.sh"
-        cmd_add_db
-      fi
-      if [ "$want_auth" = true ]; then
-        source "$NEXUS_DIR/cli/add-auth.sh"
-        cmd_add_auth
-      fi
-      if [ "$api_choice" != "3" ]; then
-        source "$NEXUS_DIR/cli/add-api.sh"
-        cmd_add_api
-      fi
-      source "$NEXUS_DIR/cli/add-hooks.sh"
-      cmd_add_hooks
-      if [ "$want_ci" = true ]; then
-        source "$NEXUS_DIR/cli/add-ci.sh"
-        cmd_add_ci
-      fi
-    else
-      echo ""
-      echo -e "  Available commands:"
-      echo -e "    ${GREEN}nexus add db${NC}     — database layer (Drizzle + Postgres)"
-      echo -e "    ${GREEN}nexus add auth${NC}   — auth layer (Clerk)"
-      echo -e "    ${GREEN}nexus add api${NC}    — API layer (tRPC)"
-      echo -e "    ${GREEN}nexus add hooks${NC}  — git hooks + scripts"
-      echo -e "    ${GREEN}nexus add ci${NC}     — CI workflow"
-    fi
+    update_checksum ".claude/settings.json"
   else
-    echo ""
-    printf "  Set up hooks? [Y/n]: "
-    read hooks_ans || true
-    if [ "${hooks_ans:-y}" != "n" ] && [ "${hooks_ans:-y}" != "N" ]; then
-      source "$NEXUS_DIR/cli/add-hooks.sh"
-      cmd_add_hooks
-    fi
+    print_skip "settings.json (already exists)"
   fi
 
-  # ── Pending installs ──────────────────────────────────────────────
-  if [ -n "$PENDING_INSTALLS" ]; then
-    echo ""
-    echo -e "  ${BOLD}Run these to install dependencies:${NC}"
-    printf "$PENDING_INSTALLS"
+  # ── Post-setup ──────────────────────────────────────────────────
+
+  # Add .nexus-checksums and .nexus-version to gitignore
+  append_to_file ".gitignore" ".nexus-checksums" ".nexus-checksums" > /dev/null 2>&1 || true
+  append_to_file ".gitignore" ".nexus-version" ".nexus-version" > /dev/null 2>&1 || true
+
+  # Stamp version
+  cp "$NEXUS_DIR/VERSION" ".nexus-version"
+
+  # Sync CLAUDE.md file structure
+  if [ -f "scripts/sync-claude-md.sh" ] && [ -f "CLAUDE.md" ]; then
+    bash scripts/sync-claude-md.sh 2>/dev/null && echo -e "  ${GREEN}synced${NC} CLAUDE.md file structure" || true
   fi
 
-  # ── Offer commit ──────────────────────────────────────────────────
+  # Install lefthook if available
+  if has_cmd lefthook && [ -f "lefthook.yml" ]; then
+    lefthook install > /dev/null 2>&1 && echo -e "  ${GREEN}activated${NC} pre-commit hooks" || true
+  fi
+
+  # ── Summary ─────────────────────────────────────────────────────
   echo ""
-  printf "  Commit these changes? [Y/n]: "
-  read commit_ans || true
+  printf "  Commit? [Y/n]: "
+  read -r commit_ans || true
   if [ "${commit_ans:-y}" != "n" ] && [ "${commit_ans:-y}" != "N" ]; then
-    git add -A && git commit -m "chore: initialize project with nexus conventions" --quiet
-    print_ok "Committed"
+    git add -A
+    git commit -m "chore: initialize project with nexus" --quiet 2>/dev/null || true
+    echo -e "  ${GREEN}committed${NC}"
   fi
 
-  # ── Done ──────────────────────────────────────────────────────────
   echo ""
-  echo -e "  ${GREEN}${BOLD}Done.${NC} Run ${CYAN}nexus doctor${NC} anytime to check project health."
+  echo -e "  ${BOLD}Done.${NC} Hooks are active. Run ${GREEN}nexus${NC} to check project health."
   echo ""
 }
