@@ -1,0 +1,60 @@
+# justfile — web app
+
+set dotenv-load := true
+
+# Start local dev environment (Docker services + Next.js)
+dev:
+    docker compose up -d
+    pnpm dev
+
+# Build for production
+build:
+    pnpm build
+
+# Run the test suite
+test:
+    pnpm test
+
+# Type-check without emitting
+typecheck:
+    pnpm tsc --noEmit
+
+# Lint the codebase
+lint:
+    pnpm lint
+
+# Run pending DB migrations
+db-migrate:
+    pnpm drizzle-kit migrate
+
+# Seed the database
+db-seed:
+    pnpm tsx scripts/seed.ts
+
+# Drop and recreate the DB, then migrate and seed
+db-reset:
+    pnpm tsx scripts/db-reset.ts
+
+# Open Drizzle Studio
+db-studio:
+    pnpm drizzle-kit studio
+
+# Check that all required tools and env vars are present
+doctor:
+    pnpm tsx scripts/doctor.ts
+
+# Auto-fix common doctor issues
+doctor-fix:
+    pnpm tsx scripts/doctor-fix.ts
+
+# Show outdated dependencies
+outdated:
+    pnpm outdated
+
+# Find dead (unused) exports
+dead-code:
+    pnpm tsx scripts/find-dead-code.ts
+
+# Run security audit
+audit:
+    pnpm audit
