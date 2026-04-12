@@ -1,9 +1,9 @@
 {
   "hooks": {
-    "PostToolUse": [
+    "PreToolUse": [
       {
-        "matcher": "Write|Edit",
-        "command": "bash scripts/sync-claude-md.sh 2>/dev/null || true"
+        "matcher": "Bash|Read|Glob|Grep",
+        "command": "bash ~/.nexus/scripts/session-sync.sh 2>/dev/null || true"
       }
     ],
     "onStop": [
