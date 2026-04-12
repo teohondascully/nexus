@@ -60,9 +60,7 @@ shell-integration = zsh
 
 background-opacity = 0.92
 unfocused-split-opacity = 0.85
-window-decoration = false
 window-theme = ghostty
-macos-titlebar-style = hidden
 
 font-thicken = true
 adjust-cell-height = 2
