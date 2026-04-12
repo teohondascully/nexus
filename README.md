@@ -96,7 +96,7 @@ Two enforcement layers work together:
 | **Go** | Universal only | env sync, CLAUDE.md sync | 3 (CLAUDE.md, env, version) |
 | **Python** | Universal only | env sync, CLAUDE.md sync | 3 (CLAUDE.md, env, version) |
 | **Rust** | Universal only | env sync, CLAUDE.md sync | 3 (CLAUDE.md, env, version) |
-| **Generic** | Universal only | CLAUDE.md sync | 2 (CLAUDE.md, version) |
+| **Generic** | Universal only | env sync, CLAUDE.md sync | 2 (CLAUDE.md, version) |
 
 ### Updating nexus
 
