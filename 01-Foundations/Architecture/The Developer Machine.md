@@ -35,8 +35,21 @@ Each layer wraps the previous one. Optimize from the bottom up.
 - Free, open-source, non-profit stewarded
 - Fastest terminal in benchmarks (lower latency than Warp, iTerm2, Alacritty)
 
-**Config:** `~/.config/ghostty/config`
-```
+**Setup (step by step):**
+
+```bash
+# 1. Install Ghostty
+brew install --cask ghostty
+
+# 2. Create config directory and themes directory
+mkdir -p ~/.config/ghostty/themes
+
+# 3. Download Catppuccin Mocha theme
+curl -o ~/.config/ghostty/themes/catppuccin-mocha \
+  https://raw.githubusercontent.com/catppuccin/ghostty/main/themes/catppuccin-mocha
+
+# 4. Create the config file
+cat > ~/.config/ghostty/config << 'CONF'
 font-family = JetBrains Mono
 font-size = 14
 theme = catppuccin-mocha
@@ -44,7 +57,33 @@ window-padding-x = 8
 window-padding-y = 8
 cursor-style = block
 shell-integration = zsh
+
+background-opacity = 0.92
+unfocused-split-opacity = 0.85
+window-decoration = false
+window-theme = ghostty
+macos-titlebar-style = hidden
+
+font-thicken = true
+adjust-cell-height = 2
+
+cursor-style-blink = false
+mouse-hide-while-typing = true
+copy-on-select = clipboard
+
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+shift+enter=toggle_split_zoom
+CONF
 ```
+
+**What this config does:**
+- Semi-transparent background (0.92) with dimmed unfocused splits — keeps context without distraction
+- Hidden titlebar (`macos-titlebar-style = hidden`) — maximum screen real estate
+- `font-thicken` + `adjust-cell-height = 2` — sharper text on Retina displays
+- No cursor blink, hide mouse while typing — less visual noise
+- `copy-on-select = clipboard` — select text to copy, no cmd+c needed
+- **Splits:** `cmd+d` for vertical, `cmd+shift+d` for horizontal, `cmd+shift+enter` to zoom a split (same muscle memory as iTerm2)
 
 ### Runner-up: Warp
 - AI-powered command suggestions (good for learning new CLI tools)

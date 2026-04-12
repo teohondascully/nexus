@@ -41,6 +41,38 @@ brew install --cask ghostty           # Terminal emulator
 brew install starship                  # Shell prompt
 brew install --cask font-jetbrains-mono-nerd-font  # Font with icons
 
+# Ghostty config + Catppuccin theme
+mkdir -p ~/.config/ghostty/themes
+curl -o ~/.config/ghostty/themes/catppuccin-mocha \
+  https://raw.githubusercontent.com/catppuccin/ghostty/main/themes/catppuccin-mocha
+
+cat > ~/.config/ghostty/config << 'GHOSTTY'
+font-family = JetBrains Mono
+font-size = 14
+theme = catppuccin-mocha
+window-padding-x = 8
+window-padding-y = 8
+cursor-style = block
+shell-integration = zsh
+
+background-opacity = 0.92
+unfocused-split-opacity = 0.85
+window-decoration = false
+window-theme = ghostty
+macos-titlebar-style = hidden
+
+font-thicken = true
+adjust-cell-height = 2
+
+cursor-style-blink = false
+mouse-hide-while-typing = true
+copy-on-select = clipboard
+
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+shift+enter=toggle_split_zoom
+GHOSTTY
+
 # ============================================
 # 4. Modern CLI Replacements
 # ============================================
@@ -72,7 +104,7 @@ brew install mise
 # ============================================
 echo "Installing runtimes..."
 eval "$(mise activate zsh)"
-mise use --global node@22
+mise use --global node@24
 mise use --global python@3.12
 
 # pnpm (JS package manager)
@@ -209,7 +241,7 @@ echo ""
 echo "Next steps:"
 echo "  1. Restart your terminal (or run: source ~/.zshrc)"
 echo "  2. Open Docker Desktop (first launch requires manual start)"
-echo "  3. Open Ghostty and set font to 'JetBrains Mono Nerd Font'"
+echo "  3. Open Ghostty — config and theme are already set up"
 echo "  4. Run 'claude' to set up Claude Code API key"
 echo "  5. Start building: cd ~/dev && mkdir my-project && cd my-project"
 echo ""
