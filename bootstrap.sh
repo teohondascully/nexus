@@ -17,7 +17,7 @@ DIM='\033[2m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-TOTAL_STEPS=13
+TOTAL_STEPS=12
 CURRENT_STEP=0
 INSTALLED=()
 SKIPPED=()
@@ -95,31 +95,30 @@ ask() {
 # ── Welcome ──────────────────────────────────────────────────────
 clear
 echo ""
-echo -e "${BOLD}╔════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}║          Machine Bootstrap — Dev Environment          ║${NC}"
-echo -e "${BOLD}║                  Last updated: 2026-04-11             ║${NC}"
-echo -e "${BOLD}╠════════════════════════════════════════════════════════╣${NC}"
-echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  This script sets up a complete dev environment:       ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   1.  Xcode CLI Tools    ${DIM}(git, compilers)${NC}              ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   2.  Homebrew            ${DIM}(package manager)${NC}            ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   3.  Ghostty + config    ${DIM}(terminal emulator)${NC}          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   4.  Modern CLI tools    ${DIM}(ripgrep, bat, eza, etc.)${NC}    ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   5.  Advanced CLI tools  ${DIM}(httpie, yazi, btop, etc.)${NC}   ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   6.  mise                ${DIM}(version manager)${NC}            ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   7.  Node + pnpm + Bun   ${DIM}(JS runtimes & packages)${NC}    ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   8.  Python + uv + Ruff  ${DIM}(Python toolchain)${NC}          ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}   9.  Docker Desktop      ${DIM}(containerization)${NC}           ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  10.  Cursor              ${DIM}(AI-native IDE)${NC}              ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  11.  Claude Code         ${DIM}(CLI AI agent)${NC}               ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  12.  Git config          ${DIM}(delta, rebase, rerere)${NC}      ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  13.  Shell config        ${DIM}(aliases, prompt, tools)${NC}     ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  ${GREEN}Safe to re-run — skips anything already installed.${NC}    ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}  ${YELLOW}Optional steps will ask before installing.${NC}           ${BOLD}║${NC}"
-echo -e "${BOLD}║${NC}                                                        ${BOLD}║${NC}"
-echo -e "${BOLD}╚════════════════════════════════════════════════════════╝${NC}"
+echo -e "${BOLD}╔══════════════════════════════════════════════════════════╗${NC}"
+echo -e "${BOLD}║           Machine Bootstrap — Dev Environment            ║${NC}"
+echo -e "${BOLD}║              Last approved by Teo: 2026-04-11            ║${NC}"
+echo -e "${BOLD}╠══════════════════════════════════════════════════════════╣${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  This script sets up a complete dev environment:          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    1.  Xcode CLI Tools     ${DIM}(git, compilers)${NC}              ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    2.  Homebrew             ${DIM}(package manager)${NC}             ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    3.  Ghostty + config     ${DIM}(terminal emulator)${NC}           ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    4.  Modern CLI tools     ${DIM}(ripgrep, bat, eza, etc.)${NC}     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    5.  Advanced CLI tools   ${DIM}(httpie, yazi, btop, etc.)${NC}    ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    6.  mise                 ${DIM}(version manager)${NC}             ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    7.  Node + pnpm + Bun    ${DIM}(JS runtimes & packages)${NC}     ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    8.  Python + uv + Ruff   ${DIM}(Python toolchain)${NC}           ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}    9.  Docker Desktop       ${DIM}(containerization)${NC}            ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   10.  Claude Code          ${DIM}(CLI AI agent)${NC}                ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   11.  Git config           ${DIM}(delta, rebase, rerere)${NC}       ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}   12.  Shell config         ${DIM}(aliases, prompt, tools)${NC}      ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  ${GREEN}Safe to re-run — skips anything already installed.${NC}      ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}  ${YELLOW}Optional steps will ask before installing.${NC}              ${BOLD}║${NC}"
+echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
+echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 read -p "Press Enter to start (or Ctrl+C to cancel)..."
 
@@ -359,20 +358,7 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════
-# STEP 10: Editor
-# ═════════════════════════════════════════════════════════════════
-step "Editor: Cursor" "AI-native IDE (VS Code fork). Use alongside Claude Code for visual diff review."
-
-if has_cask cursor; then
-  skipped "cursor"
-else
-  if ask "Cursor (AI-native IDE)" "VS Code fork with Composer, background agents, Design Mode. \$20/mo for Pro."; then
-    brew_install_cask "cursor" "AI-native IDE"
-  fi
-fi
-
-# ═════════════════════════════════════════════════════════════════
-# STEP 11: Claude Code
+# STEP 10: Claude Code
 # ═════════════════════════════════════════════════════════════════
 step "Claude Code" "Anthropic's CLI agent. Terminal-first, hooks for verification, 1M context, MCP servers."
 
@@ -388,7 +374,7 @@ else
 fi
 
 # ═════════════════════════════════════════════════════════════════
-# STEP 12: Git Config
+# STEP 11: Git Config
 # ═════════════════════════════════════════════════════════════════
 step "Git Config" "delta for beautiful diffs, rebase on pull, auto-setup remote, rerere for conflict memory."
 
@@ -415,7 +401,7 @@ if [ -z "$(git config --global user.email)" ]; then
 fi
 
 # ═════════════════════════════════════════════════════════════════
-# STEP 13: Shell Config
+# STEP 12: Shell Config
 # ═════════════════════════════════════════════════════════════════
 step "Shell Config" "Aliases, tool integrations, prompt. Appended to ~/.zshrc."
 
@@ -556,13 +542,14 @@ fi
 echo ""
 echo -e "${BOLD}Your toolkit:${NC}"
 echo -e "  ${CYAN}Terminal${NC}    ghostty          ${CYAN}Git TUI${NC}     lg (lazygit)"
-echo -e "  ${CYAN}Editor${NC}     cursor           ${CYAN}Docker TUI${NC}  lzd (lazydocker)"
-echo -e "  ${CYAN}AI Agent${NC}   claude           ${CYAN}Monitor${NC}     btop (or: top)"
-echo -e "  ${CYAN}Search${NC}     rg (ripgrep)     ${CYAN}Disk${NC}        dust (or: du)"
-echo -e "  ${CYAN}Navigate${NC}   cd (zoxide)      ${CYAN}Files${NC}       y (yazi)"
-echo -e "  ${CYAN}Find${NC}       fd + fzf         ${CYAN}API Test${NC}    http (httpie)"
+echo -e "  ${CYAN}AI Agent${NC}   claude           ${CYAN}Docker TUI${NC}  lzd (lazydocker)"
+echo -e "  ${CYAN}Search${NC}     rg (ripgrep)     ${CYAN}Monitor${NC}     btop (or: top)"
+echo -e "  ${CYAN}Navigate${NC}   cd (zoxide)      ${CYAN}Disk${NC}        dust (or: du)"
+echo -e "  ${CYAN}Find${NC}       fd + fzf         ${CYAN}Files${NC}       y (yazi)"
+echo -e "  ${CYAN}API Test${NC}   http (httpie)    ${CYAN}GitHub${NC}      gh"
 echo -e "  ${CYAN}JSON${NC}       jq               ${CYAN}History${NC}     atuin (ctrl+r)"
 echo -e "  ${CYAN}Benchmark${NC}  hyperfine        ${CYAN}Man Pages${NC}   tldr"
+echo -e "  ${CYAN}Launcher${NC}   nexus            ${CYAN}Tasks${NC}       just"
 echo ""
-echo -e "${DIM}Script version: 2026-04-11 | Reference: The Developer Machine note${NC}"
+echo -e "${DIM}Last approved by Teo: 2026-04-11 | Reference: The Developer Machine note${NC}"
 echo ""

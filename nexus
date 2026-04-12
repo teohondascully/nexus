@@ -1,0 +1,517 @@
+#!/bin/bash
+# ================================================================
+# nexus — Session launcher for the Nexus developer vault
+# Reads vault templates, assembles prompts, launches Claude Code
+# Last updated: 2026-04-11
+# ================================================================
+
+# ── Config ───────────────────────────────────────────────────────
+VAULT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TEMPLATES="$VAULT_DIR/03-Templates"
+TOOLS="$VAULT_DIR/02-Tools-and-Meta"
+FOUNDATIONS="$VAULT_DIR/01-Foundations"
+
+# ── Colors ───────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+DIM='\033[2m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# ── Helpers ──────────────────────────────────────────────────────
+prompt_input() {
+  echo -e "${CYAN}${1}${NC}"
+  read -r REPLY
+  echo "$REPLY"
+}
+
+prompt_multiline() {
+  echo -e "${CYAN}${1}${NC}"
+  echo -e "${DIM}(one per line, empty line to finish)${NC}"
+  local lines=""
+  while true; do
+    read -r line
+    [[ -z "$line" ]] && break
+    lines="${lines}- [ ] ${line}\n"
+  done
+  echo -e "$lines"
+}
+
+copy_and_show() {
+  local prompt="$1"
+  echo ""
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "${BOLD}Your prompt:${NC}"
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo ""
+  echo -e "$prompt"
+  echo ""
+  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+  # Copy to clipboard
+  echo -e "$prompt" | pbcopy
+  echo -e "${GREEN}Copied to clipboard.${NC}"
+  echo ""
+
+  # Offer to launch Claude Code directly
+  echo -e "${CYAN}Launch Claude Code with this prompt? [Y/n]${NC}"
+  read -n 1 -r
+  echo ""
+  if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
+    echo -e "$prompt" | claude
+  fi
+}
+
+# ── Commands ─────────────────────────────────────────────────────
+
+cmd_feature() {
+  echo ""
+  echo -e "${BOLD}New Feature — Session Prompt Builder${NC}"
+  echo -e "${DIM}Builds a prompt from: Prompt Patterns + Feature Slice + Session Workflow${NC}"
+  echo ""
+
+  # Gather inputs
+  echo -e "${CYAN}Feature name:${NC} (e.g., 'order management', 'user settings page')"
+  read -r feature_name
+
+  echo ""
+  echo -e "${CYAN}User story:${NC}"
+  echo -e "${DIM}As a [role], I want to [action], so that [outcome]${NC}"
+  echo -e "${CYAN}  Role:${NC}"
+  read -r role
+  echo -e "${CYAN}  Action (I want to...):${NC}"
+  read -r action
+  echo -e "${CYAN}  Outcome (so that...):${NC}"
+  read -r outcome
+
+  echo ""
+  echo -e "${CYAN}Acceptance criteria:${NC}"
+  echo -e "${DIM}(one per line, empty line to finish)${NC}"
+  criteria=""
+  while true; do
+    read -r line
+    [[ -z "$line" ]] && break
+    criteria="${criteria}- [ ] ${line}\n"
+  done
+
+  echo ""
+  echo -e "${CYAN}Existing file to follow as a pattern?${NC} ${DIM}(leave blank if none)${NC}"
+  read -r pattern_file
+
+  pattern_line=""
+  if [[ -n "$pattern_file" ]]; then
+    pattern_line="\nFollow the pattern in ${pattern_file}."
+  fi
+
+  # Assemble prompt
+  prompt="Read CLAUDE.md first.
+
+Implement: ${feature_name}
+
+User story: As a ${role}, I want to ${action}, so that ${outcome}.
+
+Acceptance criteria:
+$(echo -e "$criteria")
+${pattern_line}
+Start by proposing your approach before writing code. Break this into the smallest vertical slices — each slice should be independently testable. Build data layer → API → UI."
+
+  copy_and_show "$prompt"
+}
+
+cmd_bug() {
+  echo ""
+  echo -e "${BOLD}Bug Fix — Session Prompt Builder${NC}"
+  echo -e "${DIM}Builds a prompt from: Prompt Patterns + Debugging Workflow${NC}"
+  echo ""
+
+  echo -e "${CYAN}What's happening (the bug):${NC}"
+  read -r bug_what
+
+  echo ""
+  echo -e "${CYAN}What should happen instead:${NC}"
+  read -r bug_expected
+
+  echo ""
+  echo -e "${CYAN}Steps to reproduce:${NC}"
+  echo -e "${DIM}(one per line, empty line to finish)${NC}"
+  steps=""
+  step_num=1
+  while true; do
+    read -r line
+    [[ -z "$line" ]] && break
+    steps="${steps}${step_num}. ${line}\n"
+    step_num=$((step_num + 1))
+  done
+
+  echo ""
+  echo -e "${CYAN}Any suspicion about the cause?${NC} ${DIM}(leave blank if unsure)${NC}"
+  read -r suspicion
+
+  suspicion_line=""
+  if [[ -n "$suspicion" ]]; then
+    suspicion_line="\nSuspected cause: ${suspicion}"
+  fi
+
+  prompt="Read CLAUDE.md first.
+
+Bug: ${bug_what}
+Expected: ${bug_expected}
+
+Steps to reproduce:
+$(echo -e "$steps")${suspicion_line}
+
+Find the root cause before proposing a fix. Do NOT modify any existing tests. If a test fails, fix the implementation, not the test."
+
+  copy_and_show "$prompt"
+}
+
+cmd_refactor() {
+  echo ""
+  echo -e "${BOLD}Refactor — Session Prompt Builder${NC}"
+  echo ""
+
+  echo -e "${CYAN}What to refactor:${NC} ${DIM}(file, module, or area)${NC}"
+  read -r target
+
+  echo ""
+  echo -e "${CYAN}Goal of the refactor:${NC}"
+  read -r goal
+
+  prompt="Read CLAUDE.md first.
+
+Refactor ${target} to ${goal}.
+
+Requirements:
+- All existing tests must continue to pass
+- No behavioral changes — this is a pure refactor
+- Follow our dependency direction
+
+Make changes incrementally. Commit after each step passes tests."
+
+  copy_and_show "$prompt"
+}
+
+cmd_scaffold() {
+  echo ""
+  echo -e "${BOLD}Scaffold Entity — Full-Stack Prompt Builder${NC}"
+  echo -e "${DIM}Generates: DB schema → repository → service → API routes → validation → tests${NC}"
+  echo ""
+
+  echo -e "${CYAN}Entity name:${NC} ${DIM}(e.g., 'order', 'product', 'comment')${NC}"
+  read -r entity
+
+  echo ""
+  echo -e "${CYAN}Key fields:${NC}"
+  echo -e "${DIM}(one per line like 'name: string', empty line to finish)${NC}"
+  fields=""
+  while true; do
+    read -r line
+    [[ -z "$line" ]] && break
+    fields="${fields}  - ${line}\n"
+  done
+
+  echo ""
+  echo -e "${CYAN}Reference entity to follow?${NC} ${DIM}(e.g., 'users', leave blank if none)${NC}"
+  read -r ref_entity
+
+  ref_line="Follow existing patterns exactly."
+  if [[ -n "$ref_entity" ]]; then
+    ref_line="Follow the pattern in the ${ref_entity} files exactly."
+  fi
+
+  prompt="Read CLAUDE.md first.
+
+Create the full stack for a new '${entity}' entity:
+
+Fields:
+$(echo -e "$fields")
+Build in this order:
+1. DB schema (follow the pattern — id, created_at, updated_at, deleted_at)
+2. Repository (database queries only)
+3. Service (business logic only)
+4. API routes: GET (list + detail), POST, PATCH, DELETE
+5. Zod validation schemas for create and update
+6. Integration tests for each endpoint
+
+${ref_line} Every table gets id, created_at, updated_at, deleted_at.
+
+Propose your approach before writing code."
+
+  copy_and_show "$prompt"
+}
+
+cmd_review() {
+  echo ""
+  echo -e "${BOLD}Code Review — Checklist Loader${NC}"
+  echo -e "${DIM}Source: Template — PR Review Checklist${NC}"
+  echo ""
+
+  echo -e "${CYAN}How many recent commits to review?${NC} ${DIM}(default: 3)${NC}"
+  read -r num_commits
+  num_commits=${num_commits:-3}
+
+  prompt="Read CLAUDE.md first.
+
+Review the changes in the last ${num_commits} commits. Check for:
+
+Architecture:
+- Does the dependency direction hold? (no backward imports)
+- Is business logic in services, NOT in route handlers or components?
+- Do new files follow existing naming conventions?
+
+Types & Validation:
+- Any \`any\` types or \`@ts-ignore\` introduced?
+- Are new API inputs validated with Zod at the boundary?
+- Do types derive from the DB schema, or are they manually duplicated?
+
+Testing:
+- Were any existing tests removed or weakened?
+- Does the change include at least one test for the happy path?
+
+Security:
+- Auth check on every new endpoint?
+- No secrets hardcoded?
+- No unsanitized user input in DB queries or HTML?
+
+Agent Red Flags:
+- Hallucinated imports (packages not in package.json)?
+- Over-abstracted code for simple operations?
+- TODO comments left behind?
+
+Do NOT make changes. Only report issues with file paths and line numbers."
+
+  copy_and_show "$prompt"
+}
+
+cmd_audit() {
+  echo ""
+  echo -e "${BOLD}Project Audit — Full Checklist${NC}"
+  echo -e "${DIM}Source: Template — Audit Checklist${NC}"
+  echo ""
+
+  prompt="Read CLAUDE.md first.
+
+Run a full project audit. Check each item and report pass/fail with evidence:
+
+Developer Experience:
+- Can a new dev run the app locally with ONE command?
+- Does git clone → install → setup → dev take under 5 minutes?
+
+Architecture:
+- Do types flow end-to-end from DB → API → client with zero manual duplication?
+- Does every API endpoint validate input, check auth, return consistent errors?
+- Is business logic in services, not route handlers or components?
+
+Quality:
+- Is there a CI pipeline that blocks merging broken code?
+- Do database migrations run forward and backward cleanly?
+- Is the core loop covered by at least one E2E test?
+- Does \`pnpm test\` pass with no flaky failures?
+- Are there no \`any\` types, \`@ts-ignore\`, or unexplained \`eslint-disable\`?
+
+Operations:
+- Can you find root cause of a production error within 5 minutes?
+- Is every secret in env vars, never in code, never logged?
+
+Resilience:
+- Are background jobs idempotent and retryable?
+- Does the app handle double-submissions gracefully?
+- Does the app crash on startup if a required env var is missing?
+
+Report as a scorecard: total checks passed out of total."
+
+  copy_and_show "$prompt"
+}
+
+cmd_new_project() {
+  echo ""
+  echo -e "${BOLD}New Project — Pre-Build Interrogation${NC}"
+  echo -e "${DIM}Source: Template — Pre-Build Interrogation${NC}"
+  echo -e "${DIM}Answer these 5 questions before touching code.${NC}"
+  echo ""
+
+  echo -e "${CYAN}1. What is the core loop?${NC}"
+  echo -e "${DIM}   Format: User does X → system does Y → user gets Z${NC}"
+  read -r core_loop
+
+  echo ""
+  echo -e "${CYAN}2. Who are the main actors?${NC}"
+  echo -e "${DIM}   (comma-separated, e.g., 'end user, admin, webhook')${NC}"
+  read -r actors
+
+  echo ""
+  echo -e "${CYAN}3. What are the core entities (3-5)?${NC}"
+  echo -e "${DIM}   (comma-separated, e.g., 'users, orders, products')${NC}"
+  read -r entities
+
+  echo ""
+  echo -e "${CYAN}4. What failure would kill you?${NC}"
+  read -r critical_failure
+
+  echo ""
+  echo -e "${CYAN}5. Project name:${NC}"
+  read -r project_name
+
+  prompt="I'm starting a new project called '${project_name}'.
+
+Core loop: ${core_loop}
+Actors: ${actors}
+Core entities: ${entities}
+Critical failure mode: ${critical_failure}
+
+Help me build the foundation. Start by:
+
+1. Create the project directory with a monorepo scaffold (Turborepo + pnpm)
+2. Set up .mise.toml with node@24
+3. Create a CLAUDE.md at root with:
+   - The tech stack (Next.js 16 App Router, TypeScript strict, Postgres + Drizzle, Tailwind v4 + shadcn/ui)
+   - Dependency direction chain
+   - File structure conventions
+   - Testing requirements
+4. Set up docker-compose.yml with Postgres and Redis
+5. Initialize the database schema with the core entities: ${entities}
+   - Every table gets: id (uuid), created_at, updated_at, deleted_at
+6. Add a seed script with realistic test data
+7. Set up pnpm scripts: dev, build, test, typecheck, lint, db:migrate, db:seed
+
+Propose the full plan before writing any code."
+
+  copy_and_show "$prompt"
+}
+
+cmd_page() {
+  echo ""
+  echo -e "${BOLD}New Page — UI Prompt Builder${NC}"
+  echo ""
+
+  echo -e "${CYAN}Route:${NC} ${DIM}(e.g., '/orders', '/settings/billing')${NC}"
+  read -r route
+
+  echo ""
+  echo -e "${CYAN}What does this page show?${NC}"
+  read -r page_desc
+
+  echo ""
+  echo -e "${CYAN}Data source:${NC} ${DIM}(e.g., 'GET /api/orders', 'tRPC orders.list')${NC}"
+  read -r data_source
+
+  echo ""
+  echo -e "${CYAN}Layout type:${NC}"
+  echo "  1. Table (list of items)"
+  echo "  2. Detail page (single item)"
+  echo "  3. Form (create/edit)"
+  echo "  4. Dashboard (multiple sections)"
+  read -n 1 -r layout_choice
+  echo ""
+
+  case $layout_choice in
+    1) layout="a table/list with pagination" ;;
+    2) layout="a detail view" ;;
+    3) layout="a form with validation" ;;
+    4) layout="a dashboard with multiple sections" ;;
+    *) layout="an appropriate layout" ;;
+  esac
+
+  echo ""
+  echo -e "${CYAN}Existing page to follow as pattern?${NC} ${DIM}(leave blank if none)${NC}"
+  read -r ref_page
+
+  ref_line=""
+  if [[ -n "$ref_page" ]]; then
+    ref_line="Follow the component structure in ${ref_page}."
+  fi
+
+  prompt="Read CLAUDE.md first.
+
+Create a page at ${route} that:
+1. Fetches data from ${data_source}
+2. Displays ${page_desc} in ${layout}
+3. Handles loading, error, and empty states
+4. Uses shadcn/ui components
+
+${ref_line}
+
+Follow existing component patterns in src/components/. Propose your approach before writing code."
+
+  copy_and_show "$prompt"
+}
+
+# ── Main Menu ────────────────────────────────────────────────────
+
+cmd_help() {
+  echo ""
+  echo -e "${BOLD}nexus${NC} — Session launcher for your dev vault"
+  echo ""
+  echo -e "${BOLD}Usage:${NC} nexus <command>"
+  echo ""
+  echo -e "${BOLD}Start a session:${NC}"
+  echo -e "  ${GREEN}feature${NC}      Build a new feature (most common)"
+  echo -e "  ${GREEN}bug${NC}          Fix a bug"
+  echo -e "  ${GREEN}refactor${NC}     Refactor code"
+  echo -e "  ${GREEN}scaffold${NC}     Generate a full entity (DB → API → UI → tests)"
+  echo -e "  ${GREEN}page${NC}         Create a new page/route"
+  echo ""
+  echo -e "${BOLD}Quality:${NC}"
+  echo -e "  ${GREEN}review${NC}       Code review recent commits"
+  echo -e "  ${GREEN}audit${NC}        Full project audit checklist"
+  echo ""
+  echo -e "${BOLD}Project:${NC}"
+  echo -e "  ${GREEN}new-project${NC}  Start a new project from scratch"
+  echo ""
+  echo -e "${DIM}Each command asks a few questions, builds a prompt from your vault${NC}"
+  echo -e "${DIM}templates, copies it to clipboard, and offers to launch Claude Code.${NC}"
+  echo ""
+}
+
+cmd_menu() {
+  echo ""
+  echo -e "${BOLD}╔════════════════════════════════════════════╗${NC}"
+  echo -e "${BOLD}║          nexus — What are you doing?       ║${NC}"
+  echo -e "${BOLD}╠════════════════════════════════════════════╣${NC}"
+  echo -e "${BOLD}║${NC}                                            ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}1${NC}  Build a new feature                   ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}2${NC}  Fix a bug                             ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}3${NC}  Refactor code                         ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}4${NC}  Scaffold a new entity (full-stack)    ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}5${NC}  Create a new page                     ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}6${NC}  Review recent code changes            ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}7${NC}  Audit project quality                 ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}  ${GREEN}8${NC}  Start a new project                   ${BOLD}║${NC}"
+  echo -e "${BOLD}║${NC}                                            ${BOLD}║${NC}"
+  echo -e "${BOLD}╚════════════════════════════════════════════╝${NC}"
+  echo ""
+  echo -e "${CYAN}Choose [1-8]:${NC}"
+  read -n 1 -r choice
+  echo ""
+
+  case $choice in
+    1) cmd_feature ;;
+    2) cmd_bug ;;
+    3) cmd_refactor ;;
+    4) cmd_scaffold ;;
+    5) cmd_page ;;
+    6) cmd_review ;;
+    7) cmd_audit ;;
+    8) cmd_new_project ;;
+    *) echo -e "${RED}Invalid choice.${NC}" && cmd_menu ;;
+  esac
+}
+
+# ── Entry Point ──────────────────────────────────────────────────
+
+case "${1:-}" in
+  feature)      cmd_feature ;;
+  bug)          cmd_bug ;;
+  refactor)     cmd_refactor ;;
+  scaffold)     cmd_scaffold ;;
+  page)         cmd_page ;;
+  review)       cmd_review ;;
+  audit)        cmd_audit ;;
+  new-project)  cmd_new_project ;;
+  help|--help)  cmd_help ;;
+  "")           cmd_menu ;;
+  *)            echo -e "${RED}Unknown command: $1${NC}" && cmd_help ;;
+esac
