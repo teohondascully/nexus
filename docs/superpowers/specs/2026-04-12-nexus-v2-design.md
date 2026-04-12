@@ -1,0 +1,407 @@
+# Nexus v2 — Automated Project Infrastructure
+
+> Approved 2026-04-12. Refactors nexus from a project scaffolder into automated project infrastructure — invisible guardrails that enforce quality while AI agents write code.
+
+---
+
+## Problem
+
+Every new project requires hours setting up the invisible infrastructure: CLAUDE.md, hooks to keep it in sync, pre-commit checks, conventions that prevent drift. Skip it and the project rots within weeks. Do it manually every time and you waste a day on setup instead of building.
+
+Existing init tools (create-next-app, etc.) handle scaffolding but not ongoing enforcement. They're fire-and-forget. Nothing maintains the "web of string" that connects conventions, hooks, context files, and checks into a self-maintaining system.
+
+## Solution
+
+Nexus compiles vault knowledge (50+ architecture notes, patterns, anti-patterns) into machine-enforceable artifacts — a CLAUDE.md, scripts, and hooks — and drops them into any project. Hooks enforce quality in real-time. `nexus update` propagates new knowledge to existing projects with section-level CLAUDE.md migration.
+
+The vault is the brain. The project artifacts are the compiled output. AI agents read the artifacts, never the vault.
+
+---
+
+## Commands
+
+```
+nexus                   Runs nexus doctor (default)
+nexus doctor            Checks + recommendations dashboard
+nexus doctor --fix      Auto-fix what it can
+nexus doctor --quick    Fast subset for hooks/CI
+nexus init              Zero questions. Drops self-maintaining infrastructure.
+nexus update            Evolves project infrastructure + section-level migration
+nexus version           Shows installed version
+nexus uninstall         Removes nexus + optional package cleanup
+```
+
+---
+
+## Implementation Language
+
+- `nexus` CLI: **bash**. Zero dependencies.
+- Scripts: **bash** for file checks, **TypeScript (Bun)** for import/export analysis.
+- All output: borderless, indented text. No ASCII boxes. Scales with any terminal width.
+
+---
+
+## `nexus init`
+
+Zero questions. Run in any directory (new or existing). Detects what's there, drops what's missing.
+
+### Files dropped
+
+| File | Source of knowledge | Purpose |
+|------|-------------------|---------|
+| `CLAUDE.md` | Vault: CLAUDE.md template, Architecture Rules, Design Principles, API Patterns, Database Decision Tree | Conventions the AI agent follows. Nexus-owned sections marked with HTML comments. |
+| `scripts/sync-claude-md.sh` | Vault: Harness Engineering (context drift) | Keeps CLAUDE.md file structure section accurate |
+| `scripts/check-env-sync.sh` | Vault: Crash Early principle | Catches missing env vars before they crash prod |
+| `scripts/check-deps-direction.ts` | Vault: Harness Engineering (layered architecture enforcement) | Prevents spaghetti imports |
+| `scripts/check-dead-exports.ts` | Vault: tech debt prevention | Flags unused code accumulating |
+| `scripts/check-hallucinated-imports.ts` | Vault: Agent Red Flags (PR Review Checklist) | Catches packages in code but not in package.json |
+| `scripts/check-orphaned-files.ts` | Vault: Agent Red Flags | Detects files nothing imports (agent leftovers) |
+| `scripts/validate-startup.sh` | Vault: Crash Early principle | Crashes on boot if required env vars missing |
+| `lefthook.yml` | Vault: Harness Engineering (deterministic enforcement) | Pre-commit hooks |
+| `.claude/settings.json` | Vault: Claude Code note, Superpowers integration | Agent-time hooks |
+| `justfile` | Vault: The Developer Machine | Standard commands |
+| `.env.example` | Vault: Crash Early | Env var documentation |
+| `.mise.toml` | Vault: Version and Runtime Management | Pinned runtimes |
+| `.github/pull_request_template.md` | Vault: PR Review Checklist (full checklist) | Review quality bar |
+| `.gitignore` | Standard | Comprehensive for JS/TS |
+
+### Conflict handling
+
+If a file already exists: **skip silently**. Print `skip  CLAUDE.md (already exists)`. No interactive prompts — init is fast and non-interactive. Delete the file and re-run init to replace it.
+
+### After dropping
+
+1. Run `scripts/sync-claude-md.sh` to populate file structure
+2. Run `lefthook install` if available
+3. Stamp `.nexus-version` with current nexus VERSION
+4. Print summary of what was created and skipped
+5. Ask: `Commit? [Y/n]` (the only question)
+
+---
+
+## CLAUDE.md Template
+
+Two kinds of sections:
+
+**Nexus-owned** (updated by `nexus update`, enforced by scripts):
+```markdown
+<!-- nexus:conventions -->
+## Conventions
+- All API responses follow: { data, error, metadata }
+- All errors follow: { code, message, details }
+- All database tables have: id, created_at, updated_at, deleted_at
+- No `any` types. No `@ts-ignore`. No `eslint-disable` without a comment.
+- No business logic in route handlers or components.
+- No direct database calls outside repositories.
+- Never remove or weaken existing tests. Fix the implementation.
+<!-- nexus:end -->
+
+<!-- nexus:file-structure -->
+## File Structure
+<!-- Auto-generated by scripts/sync-claude-md.sh -->
+```
+...
+```
+<!-- nexus:end -->
+
+<!-- nexus:testing -->
+## Testing Requirements
+- Run tests after every change.
+- New features require at least one integration test.
+- Core loop changes require E2E coverage.
+<!-- nexus:end -->
+
+<!-- nexus:git -->
+## Git Conventions
+- Commit after each successful step, not after a feature is complete.
+- Commit messages: type(scope): description
+- Never commit .env files or secrets.
+<!-- nexus:end -->
+```
+
+**User-owned** (nexus never touches):
+```markdown
+## Project Overview
+<!-- This is yours — describe your app here -->
+
+## Tech Stack
+<!-- This is yours — list your specific stack -->
+
+## Architecture Rules
+### Dependency Direction
+<!-- This is yours — define your chain. Example: -->
+Types → Config → Repo → Service → Runtime → UI
+```
+
+Migration rule: content between `<!-- nexus:name -->` and `<!-- nexus:end -->` is nexus-owned. Everything else is user-owned. New nexus sections get appended. Existing nexus sections get updated. User sections are never touched.
+
+---
+
+## Hook System (Automatic Enforcement)
+
+### Layer 1: lefthook (pre-commit)
+
+Blocks commits that violate conventions.
+
+```yaml
+pre-commit:
+  parallel: true
+  commands:
+    env-sync:
+      run: bash scripts/check-env-sync.sh
+    deps-direction:
+      run: "[ -f scripts/check-deps-direction.ts ] && bun scripts/check-deps-direction.ts || true"
+    hallucinated-imports:
+      run: "[ -f scripts/check-hallucinated-imports.ts ] && bun scripts/check-hallucinated-imports.ts || true"
+    typecheck:
+      run: "[ -f package.json ] && pnpm typecheck || true"
+    lint:
+      run: "[ -f package.json ] && pnpm lint || true"
+```
+
+### Layer 2: Claude Code hooks (.claude/settings.json)
+
+Catches problems while the agent writes code.
+
+- **PostToolUse** (Write|Edit): runs `sync-claude-md.sh`
+- **onStop**: runs `nexus doctor --quick`
+
+If Superpowers plugin is detected (`~/.claude/plugins/` contains superpowers): `nexus init` drops a variant without onStop (Superpowers handles it). If not detected: drops the full version with onStop running `nexus doctor --quick`. Single template file with a conditional in `init.sh` that strips the onStop block.
+
+### Layer 3: justfile (manual)
+
+```just
+doctor:
+    nexus doctor
+doctor-fix:
+    nexus doctor --fix
+```
+
+Plus placeholder dev/test/build commands the user fills in.
+
+---
+
+## `nexus doctor`
+
+### Checks (pass/fail)
+
+| # | Check | Script | In --quick |
+|---|-------|--------|------------|
+| 1 | CLAUDE.md file structure sync | sync-claude-md.sh | yes |
+| 2 | .env.example coverage | check-env-sync.sh | yes |
+| 3 | Dependency direction | check-deps-direction.ts | yes |
+| 4 | Hallucinated imports | check-hallucinated-imports.ts | yes |
+| 5 | Dead exports | check-dead-exports.ts | no |
+| 6 | Orphaned files | check-orphaned-files.ts | no |
+| 7 | Nexus version | compare VERSION vs remote | no |
+
+On failure: print details (file paths, what's wrong) indented under the check.
+
+### Recommendations (informational)
+
+Detected by scanning the project:
+
+| Recommendation | Detection |
+|----------------|-----------|
+| No linter | No eslint/biome in devDeps |
+| TypeScript strict off | tsconfig.json missing `"strict": true` |
+| No formatter | No prettier/biome config |
+| No test runner | No vitest/jest/playwright in devDeps |
+| No pre-commit hooks | No lefthook.yml or .husky/ |
+| No CLAUDE.md | File doesn't exist |
+| No .env.example | File doesn't exist |
+| No engines field | package.json missing engines |
+| CommonJS detected | package.json missing `"type": "module"` |
+
+Recommendations tell you what to do and give the one-liner. They never auto-install.
+
+### `--fix` auto-repairs
+
+- Regenerates CLAUDE.md file structure
+- Creates .env.example from code references
+- Drops CLAUDE.md skeleton if missing
+- Drops pre-commit hooks if missing
+- Reports orphaned files (with list, doesn't auto-delete)
+
+### Output format
+
+```
+  nexus doctor
+
+  ok    CLAUDE.md file structure
+  ok    .env.example coverage
+  FAIL  Dependency direction (1 violation)
+          src/components/OrderList.tsx imports from src/services/orders.ts
+  ok    Hallucinated imports
+  ok    Dead exports
+  ok    Orphaned files
+  ok    Nexus v1.1.0
+
+  6/7 passed  1 failed
+
+  Recommendations
+   ~  No test runner. Run: pnpm add -D vitest
+   ~  TypeScript strict mode is off
+
+  2 recommendations
+```
+
+---
+
+## `nexus update` — Section-Level Migration
+
+### Flow
+
+1. Pull latest `~/.nexus` via git
+2. Compare `.nexus-version` in project against current VERSION
+3. If same: "up to date." Exit.
+4. If different: proceed with migration.
+
+### Script/hook migration (same as v1)
+
+- Uncustomized scripts: silently replaced
+- Customized scripts: skipped with notice
+- New scripts: added
+- Detection via `.nexus-checksums`
+
+### CLAUDE.md section migration (new)
+
+1. Parse project's CLAUDE.md into sections (nexus-owned vs user-owned, identified by `<!-- nexus:name -->` markers)
+2. Parse the new template's CLAUDE.md into sections
+3. For each nexus-owned section in the new template:
+   - If section exists in project: replace content between markers
+   - If section is new: append to CLAUDE.md
+4. User-owned sections: never touched
+5. Show diff of changes, ask to apply
+
+### Output
+
+```
+  nexus update
+
+  Pulling latest... done (v1.0.0 → v1.1.0)
+
+  Scripts
+  ok    sync-claude-md.sh
+  up    check-deps-direction.ts (updated)
+  new   check-hallucinated-imports.ts (added)
+  skip  check-env-sync.sh (customized)
+
+  CLAUDE.md
+  skip  Project Overview (yours)
+  skip  Tech Stack (yours)
+  up    Conventions (2 new rules)
+  ok    File Structure (auto-generated)
+  up    Testing Requirements (1 rule updated)
+  new   Workflow (new section)
+  skip  Our Patterns (yours)
+
+  Apply? [Y/n/diff]
+```
+
+### Version stamp
+
+After successful update, write new version to `.nexus-version`.
+
+---
+
+## New Scripts (v2 additions)
+
+### check-hallucinated-imports.ts
+
+Scans all .ts/.tsx/.js/.jsx files for import statements. For each imported package (non-relative, non-alias):
+1. Check if it's in package.json dependencies or devDependencies
+2. Check if it's a Node built-in (fs, path, etc.)
+3. If neither: hallucinated import. Report file and package name.
+
+Exit 1 if any found.
+
+### check-orphaned-files.ts
+
+Scans all .ts/.tsx files in src/. For each file:
+1. Check if any other file imports it (by any import path that resolves to it)
+2. Check if it's a Next.js convention file (page.tsx, layout.tsx, route.ts, etc.)
+3. Check if it's an entry point (index.ts at package root, config files)
+4. If none of the above: orphaned. Report it.
+
+Exit 1 if any found. Skip if fewer than 10 files (project too small).
+
+---
+
+## File Structure (what nexus itself looks like after v2)
+
+```
+~/.nexus/
+├── nexus                     # CLI entry point
+├── cli/
+│   ├── helpers.sh            # Shared utilities
+│   ├── init.sh               # nexus init
+│   ├── doctor.sh             # nexus doctor
+│   └── update.sh             # nexus update
+├── templates/
+│   ├── CLAUDE.md             # Template with nexus-owned section markers
+│   ├── justfile
+│   ├── gitignore
+│   ├── env.example
+│   ├── mise.toml
+│   ├── pr-template.md
+│   ├── lefthook.yml
+│   └── claude-settings.json
+├── scripts/                  # Scripts dropped into projects
+│   ├── sync-claude-md.sh
+│   ├── check-env-sync.sh
+│   ├── check-deps-direction.ts
+│   ├── check-dead-exports.ts
+│   ├── check-hallucinated-imports.ts
+│   ├── check-orphaned-files.ts
+│   └── validate-startup.sh
+├── vault/                    # Obsidian knowledge base (read by humans, compiled by nexus)
+│   ├── HOME.md
+│   ├── foundations/
+│   ├── tools/
+│   ├── templates/
+│   ├── signals/
+│   └── ...
+├── bootstrap.sh
+├── install.sh
+├── VERSION
+├── CHANGELOG.md
+└── VAULT_UPDATE_PROMPT.md
+```
+
+---
+
+## What's Deleted From v1
+
+- `cli/add-db.sh`, `cli/add-auth.sh`, `cli/add-api.sh`, `cli/add-hooks.sh`, `cli/add-ci.sh`
+- `init-templates/db/`, `init-templates/auth/`, `init-templates/api/`, `init-templates/ci/`
+- `init-templates/core/CLAUDE.md.web-app`, `CLAUDE.md.other`, `justfile.web-app`, `justfile.other`
+- `init-templates/hooks/claude-settings-superpowers.json`
+- The init wizard (project type question, stack questions)
+- The `add` command entirely
+
+---
+
+## What's New in v2
+
+- `check-hallucinated-imports.ts` script
+- `check-orphaned-files.ts` script
+- Doctor recommendations tier (9 project health suggestions)
+- Doctor `--fix` expanded (creates missing CLAUDE.md, .env.example, hooks)
+- CLAUDE.md section markers (`<!-- nexus:name -->` / `<!-- nexus:end -->`)
+- Section-level CLAUDE.md migration in `nexus update`
+- `.nexus-version` file stamped in projects
+- `nexus` with no args defaults to `nexus doctor`
+- Vault moved under `vault/` subdirectory
+- Single CLAUDE.md template (no web-app/other split)
+
+---
+
+## Out of Scope (v2)
+
+- Stack-specific scaffolding (use create-next-app, Drizzle init, etc.)
+- Migration safety checks (v3 — needs DB connection)
+- Commit scope detection (v3 — needs git diff analysis)
+- Test coverage floor enforcement (v3 — needs test runner integration)
+- Multi-tool support (Cursor .cursor/rules/, Copilot AGENTS.md)
+- GUI or TUI
