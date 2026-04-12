@@ -1,9 +1,9 @@
 # nexus
 
-One-command dev environment for macOS. 30+ tools, all configs, a session launcher CLI.
+One-command dev environment + project initializer for macOS.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/teohondascully/nexus/main/install.sh | bash
+curl -fsSL https://www.teonnaise.com/install | bash
 ```
 
 ## What this does
@@ -12,10 +12,10 @@ Nexus installs and configures a complete terminal-first dev environment:
 
 - **Terminal** &mdash; Ghostty + Starship prompt + JetBrains Mono + Catppuccin theme
 - **Modern CLI** &mdash; ripgrep, bat, eza, fd, zoxide, fzf, delta, lazygit (replaces grep, cat, ls, find, cd, diff, git)
-- **Advanced tools** &mdash; atuin, httpie, jq, yazi, hyperfine, lazydocker, btop, dust, dive, gh, just, tldr
+- **Advanced tools** &mdash; atuin, httpie, jq, yazi, hyperfine, lazydocker, btop, dust, dive, gh, just, tldr, lefthook
 - **Shell** &mdash; zsh-autosuggestions, zsh-syntax-highlighting, aliases for everything
 - **Runtimes** &mdash; mise (version manager), Node 24 LTS, pnpm, Bun, Python 3.12, uv, Ruff
-- **AI coding** &mdash; Claude Code + `nexus` session launcher
+- **AI coding** &mdash; Claude Code
 - **Configs** &mdash; Ghostty, Starship, mise, git (delta, rebase, rerere), shell aliases
 
 ## Transparency
@@ -26,25 +26,70 @@ Before installing anything, press `i` at the welcome screen to see the full list
 
 ## The nexus CLI
 
-After installing, run `nexus` from any directory to launch a coding session:
+After installing, `nexus` is available from any directory. It's a project initializer + maintenance system:
 
 ```
-nexus              # interactive menu
-nexus feature      # build a new feature
-nexus bug          # fix a bug
-nexus refactor     # refactor code
-nexus scaffold     # generate full entity (DB -> API -> tests)
-nexus page         # create a new page/route
-nexus review       # code review recent commits
-nexus audit        # project quality checklist
-nexus new-project  # start from scratch
+nexus init [name]       Create or configure a project
+nexus add <layer>       Add a layer: db, auth, api, hooks, ci
+nexus doctor            Run all maintenance checks
+nexus doctor --quick    Fast checks only (no network/DB)
+nexus doctor --fix      Auto-fix what it can
+nexus update            Sync project against latest vault templates
+nexus version           Show installed version
+nexus uninstall         Remove nexus (with optional package cleanup)
 ```
 
-Each command asks a few focused questions, assembles a prompt from tested templates, copies it to your clipboard, and offers to launch Claude Code directly.
+### `nexus init`
+
+Asks what you're building (web app or other), then drops convention files into your project:
+
+- **CLAUDE.md** with dependency direction, file structure (auto-synced), and conventions
+- **justfile** with standard commands (dev, test, build, doctor, db-reset, etc.)
+- **Maintenance scripts** &mdash; env var sync, dependency direction linter, dead export detection, CLAUDE.md file-tree sync, startup validation
+- **lefthook** pre-commit hooks (typecheck, lint, env sync, dep direction)
+- **Claude Code hooks** (file-tree sync on write, doctor on stop)
+- **.gitignore**, **.env.example**, **.mise.toml**, **PR template**
+
+For web apps, optionally adds: Postgres + Drizzle, Clerk auth, tRPC + health endpoint, GitHub Actions CI.
+
+### `nexus doctor`
+
+Runs 10 checks and reports a scorecard:
+
+```
+  nexus doctor
+
+  ok    CLAUDE.md file structure
+  ok    .env.example coverage
+  ok    Dependency direction
+  FAIL  Dead exports (3 found)
+  ok    Startup validation
+  ok    Outdated dependencies
+  ok    lefthook installed
+  ok    Claude Code hooks present
+  ok    PR template present
+  ok    Nexus version (v1.0.0)
+
+  9/10 passed  1 issue(s) found
+```
+
+### Updating nexus
+
+Re-run the install command. It detects the existing install, compares versions, and offers update-only (pull + re-link) or full reinstall:
+
+```bash
+curl -fsSL https://www.teonnaise.com/install | bash
+```
+
+Or sync your project's nexus files against the latest templates:
+
+```bash
+nexus update
+```
 
 ## The knowledge vault
 
-Nexus is also an [Obsidian](https://obsidian.md) knowledge vault with 50 interconnected notes covering:
+Nexus is also an [Obsidian](https://obsidian.md) knowledge vault with 50+ interconnected notes covering:
 
 | Section | What's in it |
 |---------|-------------|
@@ -59,7 +104,7 @@ To browse the vault, install [Obsidian](https://obsidian.md) (free) and open the
 
 The vault separates **foundations** (patterns that don't change) from **tools** (things that rotate). When a tool gets replaced, the foundation pattern it serves stays the same.
 
-Notes link to each other via `[[wikilinks]]`. MOC (Map of Content) files in each section serve as entry points. The `nexus` CLI reads from the templates section to build your prompts.
+Notes link to each other via `[[wikilinks]]`. MOC (Map of Content) files in each section serve as entry points.
 
 ### Keeping it current
 
@@ -81,19 +126,27 @@ Changes to the recommended stack require explicit approval. The weekly audit upd
 
 ```
 nexus/
-├── bootstrap.sh              # the install script (idempotent, interactive)
-├── install.sh                # curl|bash entry point (clones repo + runs bootstrap)
-├── nexus                     # session launcher CLI
+├── nexus                     # CLI — project initializer + maintenance
+├── cli/                      # command implementations (init, add, doctor, update)
+├── init-templates/           # template files dropped into projects
+│   ├── core/                 # CLAUDE.md, justfile, gitignore, env, mise, PR template
+│   ├── scripts/              # maintenance scripts (env sync, dep direction, etc.)
+│   ├── hooks/                # lefthook + Claude Code hook configs
+│   ├── db/                   # Postgres + Drizzle templates
+│   ├── auth/                 # Clerk templates
+│   ├── api/                  # tRPC templates
+│   └── ci/                   # GitHub Actions workflow
+├── bootstrap.sh              # machine setup (idempotent, interactive)
+├── install.sh                # curl|bash entry point (smart update detection)
+├── VERSION                   # release version tracking
 ├── HOME.md                   # vault entry point (open in Obsidian)
-├── foundations/               # architecture, harness engineering, stack decisions
+├── foundations/              # architecture, harness engineering, stack decisions
 ├── tools/                    # AI tools, comparisons, workflows
 ├── templates/                # copy-paste scaffolds and checklists
 ├── projects/                 # project specs and plans
 ├── signals/                  # ecosystem tracking
-├── daily/                    # daily logs (optional)
 ├── CHANGELOG.md              # all vault updates with dates
-├── VAULT_UPDATE_PROMPT.md    # agent prompt for weekly audits
-└── Vault Maintenance System.md
+└── VAULT_UPDATE_PROMPT.md    # agent prompt for weekly audits
 ```
 
 ## License

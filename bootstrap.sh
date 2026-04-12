@@ -141,7 +141,7 @@ show_audit() {
   echo ""
   echo -e "  ${CYAN}docker${NC}              containerization              ${YELLOW}asks${NC}"
   echo -e "  ${CYAN}claude-code${NC}         CLI AI agent"
-  echo -e "  ${CYAN}nexus${NC}               session launcher"
+  echo -e "  ${CYAN}nexus${NC}               project initializer + maintenance"
   echo ""
   echo -e "  ${BOLD}Configs${NC} ${DIM}(only written if file doesn't exist)${NC}"
   echo ""
@@ -573,7 +573,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -f "$SCRIPT_DIR/nexus" ]; then
   mkdir -p ~/.local/bin
   ln -sf "$SCRIPT_DIR/nexus" ~/.local/bin/nexus
-  installed "nexus" "session launcher CLI — run 'nexus' from anywhere"
+  installed "nexus" "project initializer + maintenance CLI — run 'nexus' from anywhere"
 fi
 
 # ═════════════════════════════════════════════════════════════════

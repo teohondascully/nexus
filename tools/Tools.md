@@ -77,6 +77,7 @@
 | font | JetBrains Mono Nerd | whatever default | Ligatures, icons for eza/starship |
 
 ## Workflow Optimization
+- **nexus CLI** — project initializer + maintenance (`nexus init`, `nexus doctor`, `nexus update`). Drops CLAUDE.md, hooks, scripts, and templates into any project. See [[The Developer Machine]] for install.
 - [[My Claude Code Setup]] — CLAUDE.md template, hooks config, MCP servers
 - [[Session Workflow]] — how to structure a coding session for max output
 - [[Prompt Patterns That Work]] — tested prompts for common tasks
