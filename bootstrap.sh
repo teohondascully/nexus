@@ -497,6 +497,14 @@ fi
 # Dev directory
 mkdir -p ~/dev
 
+# nexus CLI — symlink into PATH
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/nexus" ]; then
+  mkdir -p ~/.local/bin
+  ln -sf "$SCRIPT_DIR/nexus" ~/.local/bin/nexus
+  installed "nexus" "session launcher CLI — run 'nexus' from anywhere"
+fi
+
 # ═════════════════════════════════════════════════════════════════
 # SUMMARY
 # ═════════════════════════════════════════════════════════════════
