@@ -1,6 +1,6 @@
 # Tool Comparison Matrix
 
-> When to use which AI coding tool. Last audited: 2026-04-11.
+> When to use which AI coding tool. Last audited: 2026-04-12.
 
 ---
 
@@ -8,14 +8,14 @@
 
 | Feature | Claude Code | Cursor 3.0 | GitHub Copilot | Superpowers/GSD |
 |---------|------------|--------|----------------|-----------------|
-| **Interface** | CLI (terminal) | IDE (VS Code fork) | IDE plugin | CLI (wraps Claude Code) |
+| **Interface** | CLI + VS Code (beta) | IDE (VS Code fork) | IDE plugin + CLI | CLI (wraps Claude Code) |
 | **Rules file** | CLAUDE.md | .cursor/rules/ | AGENTS.md + .agent.md | CLAUDE.md |
-| **Hooks/verification** | Yes (lifecycle hooks, Auto Mode) | BugBot code review | Agentic code review | Yes (inherits Claude Code) |
-| **MCP support** | Yes (500K result storage) | Yes (plugin marketplace) | Partial | Yes |
-| **Autonomous agents** | /loop, Agent Teams, sub-agents | Background/Cloud Agents | Coding Agent (issue→PR) | Yes (inherits Claude Code) |
+| **Hooks/verification** | Yes (lifecycle hooks, Auto Mode) | BugBot (78% resolution) | Agentic code review + CodeQL | Yes (inherits Claude Code) |
+| **MCP support** | Yes (500K result storage) | Yes (marketplace + BugBot) | Partial | Yes |
+| **Autonomous agents** | /loop, Agent Teams, sub-agents | Background/Cloud Agents, /worktree | Cloud Agent (issue→PR), CLI Autopilot | Yes (inherits Claude Code) |
 | **Context window** | 1M tokens (Opus/Sonnet 4.6) | Varies by model | Varies | 1M (inherits Claude) |
-| **Best for** | Agentic workflows, automation, CI | Interactive editing, parallel agents, visual diffs | Issue→PR automation, inline completions | Enhanced agentic workflows |
-| **Harness ceiling** | Level 4 | Level 2-3 | Level 2-3 | Level 4 |
+| **Best for** | Agentic workflows, automation, CI | Interactive editing, parallel agents, visual diffs | Issue→PR automation, CLI Autopilot, inline completions | Enhanced agentic workflows |
+| **Harness ceiling** | Level 4 | Level 2-3 | Level 3 | Level 4 |
 
 ## When to Use What
 
@@ -51,15 +51,17 @@
 ### GitHub Copilot
 **Use when:**
 - Already in VS Code/JetBrains and want inline suggestions
-- Want issue-to-PR automation via coding agent
+- Want issue-to-PR automation via cloud agent
+- Terminal-first workflows via Copilot CLI with Autopilot mode
 - Quick completions for boilerplate code
 - Team already standardized on it
 - Need multi-model access (Claude, Gemini, OpenAI) in one tool
 
 **Skip when:**
-- Need strong verification/hooks
+- Need strong verification/hooks (Copilot CLI is newer than Claude Code)
 - Complex multi-agent orchestration
 - Need 1M context window
+- Data privacy concerns (April 24 policy change — training on user data)
 
 ## Combining Tools
 
@@ -74,11 +76,13 @@ The key is matching the tool to the task, not picking one for everything.
 ## What to Watch For
 
 The AI coding tool space moves fast. Things that could shift this matrix:
+- **Claude Mythos Preview** — 93.9% SWE-bench, not publicly available (Project Glasswing for security research). If Anthropic ships this capability to Claude Code, it changes everything.
+- **Copilot CLI + Autopilot** — GitHub now has a real Claude Code competitor. Terminal-first, fully autonomous. Watch for ecosystem maturity and hook support.
 - **Google Antigravity** — agent-first IDE with Manager view for parallel agents. 6% adoption in 2 months. Still maturing but architecturally interesting.
 - **Windsurf + Devin merger** — Cognition acquired Windsurf, plans to merge Devin's agent capabilities into the IDE. Could create a strong IDE+agent combo.
 - **OpenAI Codex CLI** — free, open-source, supports Anthropic too. GPT-5.4 integration. Worth watching.
-- **Cursor's credit model** — if pricing stabilizes, Cursor 3.0's agent features rival Claude Code for IDE-first workflows.
-- Model improvements continuing to narrow the gap between tools.
+- **Cursor's credit model** — if pricing stabilizes, Cursor 3.0's agent features (/worktree, /best-of-n) rival Claude Code for IDE-first workflows.
+- **Node.js 26** — releasing April 22. Last under old cadence before one-major-per-year shift.
 
 Track shifts in [[🗺️ Signals MOC]].
 

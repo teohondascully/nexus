@@ -1,6 +1,6 @@
 # Beyond the Basics — The IFYKYK Layer
 
-> Tools, strategies, and decisions that most guides skip. Last audited: 2026-04-11.
+> Tools, strategies, and decisions that most guides skip. Last audited: 2026-04-12.
 
 ---
 

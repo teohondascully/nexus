@@ -44,8 +44,14 @@ Run recurring jobs on Anthropic-managed cloud infrastructure — even when your 
 ### Computer Use
 Claude can open files, run dev tools, point, click, and navigate the screen with no setup required. Available for Pro and Max users.
 
+### Checkpoints
+Automatically saves code state before each change. Rewind instantly with Esc×2 or `/rewind`. Choose to restore code, conversation, or both. Safety net for agent-driven changes.
+
 ### Auto Mode
 Smart auto-approval: safe actions run automatically, risky ones get blocked and Claude is pushed toward safer alternatives. Cuts permission prompt fatigue (93% of prompts were already being approved).
+
+### VS Code Extension (Beta)
+Claude Code is now available as a VS Code extension from the marketplace, in addition to the terminal CLI.
 
 ### Remote Control
 Send instructions from the Claude App on your phone — Claude Code executes desktop operations on your Mac. Code never leaves your computer.

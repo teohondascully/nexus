@@ -1,6 +1,6 @@
 # Version and Runtime Management
 
-> One tool per concern. No more nvm + pyenv + rbenv. No more pip. No more npm. Last audited: 2026-04-11.
+> One tool per concern. No more nvm + pyenv + rbenv. No more pip. No more npm. Last audited: 2026-04-12.
 
 ---
 
@@ -10,7 +10,7 @@
 |---------|---------|------------|---------|
 | Runtime versions (Node, Python, Go) | nvm + pyenv + rbenv | **mise** | One tool for everything, 10x faster |
 | JavaScript packages | npm / yarn | **pnpm** | 3x faster, strict, disk-efficient |
-| JavaScript runtime | Node.js | **Bun 1.3** (new projects) / Node.js (existing) | 3x HTTP throughput, native TypeScript |
+| JavaScript runtime | Node.js | **Bun 1.3.12** (new projects) / Node.js (existing) | 3x HTTP throughput, native TypeScript |
 | Python packages | pip + venv | **uv** | 10-100x faster, replaces pip + venv + pyenv |
 | Python linting | pylint / flake8 | **Ruff** | 100x faster (same team as uv) |
 
@@ -63,6 +63,8 @@ run = "pnpm test"
 
 **Why mise over asdf:** Rust binary vs. bash scripts. 10x faster shell startup. No shim overhead. Built-in env vars (replaces direnv). Built-in task runner (replaces make/just).
 
+> **mise v2026.4.9** (April 11): sandbox fields in task templates, deterministic lockfile provenance, cross-device tool install fix. Active development — multiple releases per week.
+
 ---
 
 ## uv — Python's Package Manager Revolution
@@ -110,7 +112,7 @@ uv tool install ruff
 
 Replaces: Node.js (for new projects), ts-node, tsx
 
-3x faster HTTP throughput, 4-10x faster startup, native TypeScript execution, built-in test runner and bundler. Current version: **1.3.x** (production-grade stability confirmed, 2.0 expected late 2026).
+3x faster HTTP throughput, 4-10x faster startup, native TypeScript execution, built-in test runner and bundler. Current version: **1.3.12** (April 2026 — added `Bun.WebView` headless browser API, `Bun.cron()` scheduler, markdown rendering, 120 bug fixes). 2.0 expected late 2026.
 
 ### When to Use Bun vs Node.js
 

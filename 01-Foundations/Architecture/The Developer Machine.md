@@ -525,15 +525,15 @@ git config --global rerere.enabled true
 
 ## The One-Command Setup
 
-**You don't need to do any of the above manually.** The [[Template — Machine Bootstrap]] script installs and configures everything on this page — Ghostty, Starship, all CLI tools, mise, pnpm, Bun, uv, Docker, Cursor, Claude Code, git config, shell aliases, and the Ghostty theme.
+**You don't need to do any of the above manually.** The [[Template — Machine Bootstrap]] script installs and configures everything on this page — Ghostty, Starship, all CLI tools, mise, pnpm, Bun, uv, Docker, Claude Code, git config, shell aliases, and the Ghostty theme.
 
 ```bash
 # On a fresh Mac:
-bash bootstrap.sh
+curl -fsSL https://www.teonnaise.com/install | bash
 # Restart terminal. Done.
 ```
 
-Save it as `~/bootstrap.sh` or keep it in a dotfiles repo. See the template for the full script.
+This silently clones the nexus repo to `~/.nexus`, then launches the interactive bootstrap — nothing installs until you press Enter. See the template for the full script.
 
 ---
 

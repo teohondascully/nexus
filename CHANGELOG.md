@@ -4,6 +4,47 @@
 
 ---
 
+## 2026-04-12 — Weekly Audit #2
+**Agent:** Claude Code (Opus 4.6, 1M context)
+**Trigger:** Manual — vault update agent prompt
+
+### Install Flow Redesign
+- Redesigned `install.sh` — now a silent bootstrapper (clone + hand off), no user-facing UI
+- Redesigned `bootstrap.sh` welcome screen — removed all bordered boxes, replaced with clean borderless layout
+- All `read` commands now use `/dev/tty` to work properly when piped via `curl | bash`
+- Added Ctrl-C trap for clean exit
+- Updated The Developer Machine to reference `curl -fsSL https://www.teonnaise.com/install | bash`
+- Updated Template — Machine Bootstrap with new quick start command
+
+### New Signals (2 red, 2 green, 7 yellow)
+- 🔴 **Claude Mythos Preview** (April 7) — 93.9% SWE-bench, autonomous zero-day discovery, Project Glasswing. NOT public. Added to Harness Engineering Overview as evidence that model capability isn't the bottleneck.
+- 🔴 **GitHub Copilot CLI GA + Autopilot** — terminal-first agent with autonomous mode. Direct Claude Code competitor. Added Copilot CLI section, Autopilot mode, cloud agent rename.
+- 🟡 Copilot data policy change April 24 (user data for training unless opt-out)
+- 🟡 Claude Code checkpoints + VS Code extension beta
+- 🟡 Bun 1.3.12 (WebView, Bun.cron, markdown rendering, 120 fixes)
+- 🟡 mise v2026.4.9 (sandbox tasks, lockfile provenance)
+- 🟡 uv 0.11.6 (security fix)
+- 🟡 Node.js 26 coming April 22
+- 🟡 Cursor 3.0 refinements (/worktree, /best-of-n, BugBot 78%, agent tabs)
+- 🟢 TypeScript 6.0 shipped (ES5 removed, last before Go rewrite)
+- 🟢 Node.js security bug bounty paused
+
+### Tools & Version Updates
+- Updated Bun to 1.3.12, tRPC to v11.16.0, Tailwind to v4.2, mise to v2026.4.9, uv to 0.11.6
+- Updated Copilot harness ceiling from Level 2-3 to Level 3 (Copilot CLI + Autopilot + CodeQL integration)
+- Updated Tools MOC current meta to reflect terminal-first agent convergence
+
+### Files Modified
+`install.sh`, `bootstrap.sh`, `Claude Code.md`, `GitHub Copilot.md`, `Cursor.md`, `Tool Comparison Matrix.md`, `Beyond the Basics.md`, `🗺️ Tools MOC.md`, `Version and Runtime Management.md`, `API Design Patterns.md`, `Harness Engineering Overview.md`, `The Developer Machine.md`, `Template — Machine Bootstrap.md`, `🗺️ Signals MOC.md`, `CHANGELOG.md`
+
+### Flagged for Human Review
+- <!-- REVIEW: Claude Mythos — worth a dedicated note in AI-Coding-Tools? Only if you want to track Project Glasswing -->
+- <!-- REVIEW: Copilot data policy change (April 24) — check your own Copilot settings if using it -->
+- <!-- REVIEW: TypeScript 6.0 ES5 removal — check if any of your projects target ES5 (unlikely but worth confirming) -->
+- <!-- REVIEW: Template — Machine Bootstrap still has the old script code embedded — consider removing the inline script since it now lives in bootstrap.sh and drifts -->
+
+---
+
 ## 2026-04-11 — Weekly Audit #1
 **Agent:** Claude Code (Opus 4.6, 1M context)
 **Trigger:** Manual — `VAULT_UPDATE_PROMPT.md` weekly audit

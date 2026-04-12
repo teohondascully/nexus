@@ -2,7 +2,7 @@
 
 > Layer 4 of [[The 15 Universal Layers]]. How your frontend talks to your backend. Last audited: 2026-04-11.
 
-> **Note:** tRPC v11 is stable (v11.12.0) with SSE subscriptions, FormData/binary support, and React Query v5 integration. Zod 4 is stable with 14x faster parsing and @zod/mini for smaller bundles. Code examples below use current API syntax.
+> **Note:** tRPC v11 is stable (v11.16.0 — added OpenAPI cyclic types) with SSE subscriptions, FormData/binary support, and React Query v5 integration. Zod 4 is stable with 14x faster parsing and @zod/mini for smaller bundles. Code examples below use current API syntax.
 
 ---
 

@@ -5,16 +5,16 @@
 ---
 
 ## AI Coding Tools
-- [[Claude Code]] — CLI agent, 1M context, hooks, CLAUDE.md, MCP, /loop, Computer Use
+- [[Claude Code]] — CLI agent + VS Code (beta), 1M context, hooks, CLAUDE.md, MCP, /loop, checkpoints, Computer Use
 - [[Superpowers (GSD)]] — Claude Code wrapper with enhanced workflows
 - [[Cursor]] — IDE with Cursor 3.0 agents, .cursor/rules/, Design Mode
-- [[GitHub Copilot]] — AGENTS.md, agent mode GA, coding agent, .agent.md
+- [[GitHub Copilot]] — AGENTS.md, agent mode GA, Copilot CLI, Autopilot, cloud agent, .agent.md
 - [[Tool Comparison Matrix]] — when to use which
 
 ## Current Meta (April 2026)
 - [[Beyond the Basics]] — IFYKYK tools, browser choice, Claude plans, multi-agent strategies, niche picks
-- **Harness > Model** — stop upgrading models, start building constraints ([[Harness Engineering Overview]])
-- **Agent autonomy is real** — Claude Code /loop, Copilot coding agent, Cursor background agents all ship autonomous work
+- **Harness > Model** — stop upgrading models, start building constraints ([[Harness Engineering Overview]]). Claude Mythos (93.9% SWE-bench) proves this — raw capability isn't the bottleneck, the harness is.
+- **Terminal-first agents converging** — Claude Code CLI, Copilot CLI (Autopilot mode), both ship fully autonomous terminal agents. IDE-based agents (Cursor, Copilot IDE) complement but don't replace.
 - **Vertical slices** — smallest testable feature, not big PRs
 - **CLAUDE.md is mandatory** — project conventions in context, every session
 - **Tests in the loop** — agent runs tests after every change, not at the end
@@ -32,7 +32,7 @@
 | Validation | Zod 4 | Valibot | Layer 4 |
 | Auth | Clerk | Auth.js | Layer 3 |
 | API | tRPC | Server Actions | Layer 4 |
-| Styling | Tailwind v4 + shadcn/ui | Radix | — |
+| Styling | Tailwind v4.2 + shadcn/ui | Radix | — |
 | Background Jobs | Inngest | Trigger.dev | Layer 5 |
 | Payments | Stripe | — | Layer 11 |
 | Email | Resend + React Email | Postmark | Layer 12 |
@@ -55,7 +55,7 @@
 | Prompt | Starship | Oh-My-Zsh prompt | Rust, fast, shows only what matters |
 | Version mgr | mise | nvm + pyenv + rbenv + asdf | One tool, Rust, manages env vars + tasks too |
 | JS packages | pnpm | npm / yarn | 3x faster, strict deps, best monorepo support |
-| JS runtime | Bun (new) / Node (existing) | Node.js for everything | 3x throughput, native TS, 25x faster installs |
+| JS runtime | Bun 1.3.12 (new) / Node (existing) | Node.js for everything | 3x throughput, native TS, 25x faster installs |
 | Python packages | uv | pip + venv | 10-100x faster, Rust, replaces pip + venv + pyenv |
 | Python linting | Ruff | pylint / flake8 | 100x faster, same team as uv |
 | grep | ripgrep (rg) | grep | 10-100x faster, respects .gitignore |

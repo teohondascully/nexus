@@ -78,6 +78,9 @@ Agents commit when a step succeeds, not when a feature is complete. The harness 
 ### Industry Adoption (2026)
 According to Anthropic's Agentic Coding Trends Report, developers integrate AI into **60% of their work**. Engineering roles are shifting toward agent supervision, system design, and output review. "Harness engineering" is now a mainstream term — MIT Technology Review named generative coding a 2026 Breakthrough Technology.
 
+### Claude Mythos Preview (April 7, 2026)
+Anthropic released a model scoring **93.9% SWE-bench** that can autonomously discover and chain zero-day exploits. Deliberately NOT made publicly available — instead, 50+ companies received access via **Project Glasswing** ($100M in credits) for defensive security work. This demonstrates that raw model capability is no longer the bottleneck — the harness around the model (what it's allowed to do, how it's verified) is what determines whether capability becomes value or risk.
+
 ---
 
 ## What This Means for My Workflow

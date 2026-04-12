@@ -1,6 +1,6 @@
 # Cursor
 
-> AI-native IDE (VS Code fork). Cursor 3.0 (April 2026) added background agents, cloud agents, and Design Mode. Last audited: 2026-04-11.
+> AI-native IDE (VS Code fork). Cursor 3.0 (April 2026) added background agents, cloud agents, and Design Mode. Last audited: 2026-04-12.
 
 ---
 
@@ -22,7 +22,10 @@ Standalone interface for running multiple AI agents in parallel across local mac
 Annotate and target UI elements directly in the browser. Point the agent to exactly the part of the interface you're referring to for precise feedback.
 
 ### BugBot Code Review (Cursor 3.0)
-AI code reviewer that learns from real PR feedback. Developer reactions, replies, and reviewer comments become rules that improve future reviews.
+AI code reviewer that learns from real PR feedback. Developer reactions, replies, and reviewer comments become rules that improve future reviews. MCP support added. Resolution rate now at **78%**.
+
+### Agent Tabs & Commands (Cursor 3.0)
+View multiple agent chats side-by-side or in a grid. New commands: `/worktree` creates isolated git worktrees for agent changes, `/best-of-n` runs the same task in parallel across multiple models.
 
 ### Tab Completion
 Context-aware autocomplete that predicts multi-line edits based on what you're doing.

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "01-Foundations/Architecture/The Developer Machine.md",
+                "file": "VAULT_UPDATE_PROMPT.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "The Developer Machine"
+              "title": "VAULT_UPDATE_PROMPT"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "01-Foundations/Architecture/The Developer Machine.md",
+                "file": "VAULT_UPDATE_PROMPT.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for The Developer Machine"
+              "title": "Backlinks for VAULT_UPDATE_PROMPT"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "01-Foundations/Architecture/The Developer Machine.md",
+                "file": "VAULT_UPDATE_PROMPT.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from The Developer Machine"
+              "title": "Outgoing links from VAULT_UPDATE_PROMPT"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "01-Foundations/Architecture/The Developer Machine.md",
+                "file": "VAULT_UPDATE_PROMPT.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of The Developer Machine"
+              "title": "Outline of VAULT_UPDATE_PROMPT"
             }
           }
         ]
@@ -185,6 +185,7 @@
   },
   "active": "6e3d87d602742e90",
   "lastOpenFiles": [
+    "01-Foundations/Architecture/The Developer Machine.md",
     "website-install-example.sh",
     "install.sh",
     "nexus",
@@ -196,7 +197,6 @@
     "02-Tools-and-Meta/AI-Coding-Tools/Prompt Patterns That Work.md",
     "02-Tools-and-Meta/🗺️ Tools MOC.md",
     "01-Foundations/Architecture/Version and Runtime Management.md",
-    "01-Foundations/Architecture/The Developer Machine.md",
     "03-Templates/Template — Pre-Build Interrogation.md",
     "01-Foundations/Architecture/Core Loop First.md"
   ]

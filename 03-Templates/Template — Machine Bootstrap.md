@@ -1,12 +1,24 @@
 # Template — Machine Bootstrap
 
-> One script. Fresh Mac to fully operational dev environment. Safe to re-run. Interactive. Last updated: **2026-04-11**.
+> One command. Fresh Mac to fully operational dev environment. Safe to re-run. Interactive. Last updated: **2026-04-12**.
 
 ---
 
-## The Script
+## Quick Start
 
-Save as `~/bootstrap.sh` and run with `bash bootstrap.sh`:
+```bash
+curl -fsSL https://www.teonnaise.com/install | bash
+```
+
+This silently clones the nexus repo to `~/.nexus`, then launches the interactive bootstrap below. Nothing installs until you press Enter.
+
+The install script lives at `install.sh` in the repo root. The bootstrap script is `bootstrap.sh`.
+
+---
+
+## The Bootstrap Script
+
+The full source is in `bootstrap.sh` at the repo root. Key design decisions:
 
 ```bash
 #!/bin/bash
