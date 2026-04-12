@@ -63,6 +63,10 @@ cmd_doctor() {
   elif [ -f "CLAUDE.md" ]; then
     print_ok "CLAUDE.md file structure"
     ((passed++)) || true
+  else
+    print_fail "No CLAUDE.md"
+    echo -e "        ${DIM}Run: nexus init${NC}"
+    ((failed++)) || true
   fi
 
   # ── 2. .env.example coverage (ecosystems with env patterns) ─────
@@ -183,14 +187,6 @@ cmd_doctor() {
 
   # ── Fix: drop missing infrastructure ────────────────────────────
   if $fix; then
-    if [ ! -f "CLAUDE.md" ] && [ -f "$TEMPLATES/CLAUDE.md" ]; then
-      cp "$TEMPLATES/CLAUDE.md" "CLAUDE.md"
-      if [ "$eco" = "node" ] && [ -f "$TEMPLATES/CLAUDE.md.node" ]; then
-        printf "\n" >> "CLAUDE.md"
-        cat "$TEMPLATES/CLAUDE.md.node" >> "CLAUDE.md"
-      fi
-      echo -e "  ${GREEN}created${NC} CLAUDE.md"
-    fi
     if [ ! -f "lefthook.yml" ] && [ -f "$TEMPLATES/lefthook.yml" ]; then
       cp "$TEMPLATES/lefthook.yml" "lefthook.yml"
       if [ "$eco" = "node" ] && [ -f "$TEMPLATES/lefthook.yml.node" ]; then
@@ -211,13 +207,6 @@ cmd_doctor() {
   elif [ $total -gt 0 ]; then
     echo -e "  ${passed}/${total} passed  ${RED}${failed} failed${NC}"
   fi
-
-  # ── Write health to .nexus/.last-doctor ─────────────────────────
-  mkdir -p .nexus
-  local now
-  now=$(date -u +"%Y-%m-%dT%H:%M:%S")
-  echo "- Last doctor: ${now}" > .nexus/.last-doctor
-  echo "- Result: ${passed}/${total} passed${failed:+, ${failed} failed}" >> .nexus/.last-doctor
 
   # ── Recommendations (skip if --quick) ───────────────────────────
   if ! $quick; then
@@ -280,6 +269,18 @@ cmd_doctor() {
       echo ""
       echo -e "  ${DIM}${recs} recommendation(s)${NC}"
     fi
+  fi
+
+  # ── Write health to .nexus/.last-doctor ─────────────────────────
+  mkdir -p .nexus
+  local now
+  now=$(date -u +"%Y-%m-%dT%H:%M:%S")
+  echo "- Last doctor: ${now}" > .nexus/.last-doctor
+  echo "- Result: ${passed}/${total} passed${failed:+, ${failed} failed}" >> .nexus/.last-doctor
+  if [ -n "${rec_lines:-}" ]; then
+    local clean_recs
+    clean_recs=$(printf '%b' "$rec_lines" | sed 's/^   ~  //' | sed "s/\x1b\[[0-9;]*m//g" | paste -sd', ' -)
+    echo "- Recommendations: ${clean_recs}" >> .nexus/.last-doctor
   fi
 
   echo ""

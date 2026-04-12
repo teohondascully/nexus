@@ -58,19 +58,14 @@ Detects your ecosystem and runs only the checks that apply. No "skip" noise for 
 ```
   nexus doctor
 
-  Ecosystem: Go
-
   ok    CLAUDE.md file structure
   ok    .env.example coverage
   ok    Nexus v2.1.0
 
   3/3 passed
-
-  Recommendations
-   ~  No .nexus/context.md found. Run: nexus init
-
-  1 recommendation
 ```
+
+A Node project shows all 7 checks + Node-specific recommendations. A Go project shows 3. A generic project shows 2. No skip lines — only checks that apply.
 
 ### `nexus update`
 
@@ -95,13 +90,13 @@ Two enforcement layers work together:
 
 ### What gets dropped per ecosystem
 
-| Ecosystem | CLAUDE.md | lefthook hooks | Extra checks |
-|-----------|-----------|----------------|--------------|
-| **Node** | Universal + Node conventions | typecheck, lint, env sync, dep direction | hallucinated imports, dead exports |
-| **Go** | Universal only | vet, fmt check | — |
-| **Python** | Universal only | ruff, uv sync check | — |
-| **Rust** | Universal only | clippy, fmt check | — |
-| **Generic** | Universal only | — | env coverage |
+| Ecosystem | CLAUDE.md | lefthook hooks | Doctor checks |
+|-----------|-----------|----------------|---------------|
+| **Node** | Universal + Node conventions | env sync, CLAUDE.md sync, dep direction, hallucinated imports, typecheck, lint | All 7 + Node recommendations |
+| **Go** | Universal only | env sync, CLAUDE.md sync | 3 (CLAUDE.md, env, version) |
+| **Python** | Universal only | env sync, CLAUDE.md sync | 3 (CLAUDE.md, env, version) |
+| **Rust** | Universal only | env sync, CLAUDE.md sync | 3 (CLAUDE.md, env, version) |
+| **Generic** | Universal only | CLAUDE.md sync | 2 (CLAUDE.md, version) |
 
 ### Updating nexus
 
