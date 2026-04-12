@@ -10,4 +10,4 @@
 # ================================================================
 set -e
 
-exec bash <(curl -fsSL https://raw.githubusercontent.com/teo-eb/nexus/main/install.sh)
+exec bash <(curl -fsSL https://raw.githubusercontent.com/teohondascully/nexus/main/install.sh)
