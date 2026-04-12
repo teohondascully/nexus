@@ -115,6 +115,13 @@ echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
 
+# Disable cloud context — shows email, not useful for local dev
+[gcloud]
+disabled = true
+
+[aws]
+disabled = true
+
 [git_branch]
 format = "[$branch]($style) "
 

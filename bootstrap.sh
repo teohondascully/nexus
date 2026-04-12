@@ -1,14 +1,3 @@
-# Template — Machine Bootstrap
-
-> One script. Fresh Mac to fully operational dev environment. Safe to re-run. Interactive. Last updated: **2026-04-11**.
-
----
-
-## The Script
-
-Save as `~/bootstrap.sh` and run with `bash bootstrap.sh`:
-
-```bash
 #!/bin/bash
 # ================================================================
 # Machine Bootstrap — Interactive Dev Environment Setup
@@ -577,46 +566,3 @@ echo -e "  ${CYAN}Benchmark${NC}  hyperfine        ${CYAN}Man Pages${NC}   tldr"
 echo ""
 echo -e "${DIM}Script version: 2026-04-11 | Reference: The Developer Machine note${NC}"
 echo ""
-```
-
----
-
-## After Bootstrap
-
-1. **Restart terminal** — `source ~/.zshrc` or just close and reopen
-2. **Verify:**
-   ```bash
-   node --version && pnpm --version && bun --version && uv --version && python3 --version && docker --version
-   ```
-3. **Open Docker Desktop** — first launch needs a manual start to finish setup
-4. **Set up Claude Code:** run `claude` and follow the API key flow
-5. **Start your first project** using [[Template — Monorepo Scaffold]]
-
-## Re-Running the Script
-
-The script is **fully idempotent** — safe to run again at any time:
-
-- Already-installed tools are skipped (shows "already installed")
-- Config files are only written if they don't exist yet
-- Shell config uses a marker comment to avoid duplicating the block
-- Optional tools (Bun, Python, Docker, Cursor) ask before installing
-- The summary at the end shows exactly what was installed, skipped, or failed
-
-Run it after a system update, after restoring from backup, or just to verify everything is in place.
-
-## Maintaining Your Setup
-
-- **Store this script** in your dotfiles repo alongside your config files
-- **Update the date** at the top when you change tool versions or add new tools
-- **Audit quarterly** during your [[Template — Weekly Tools Review|weekly tools review]]
-
----
-
-## Related
-- [[The Developer Machine]] — rationale behind each tool choice
-- [[Version and Runtime Management]] — deep dive on mise, uv, Bun
-- [[Template — Monorepo Scaffold]] — next step after machine setup
-
----
-
-#templates #machine-setup #bootstrap
