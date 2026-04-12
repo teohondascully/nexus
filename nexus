@@ -1,10 +1,9 @@
 #!/bin/bash
-# nexus — Project initializer + maintenance system
+# nexus — Automated project infrastructure
 # https://github.com/teohondascully/nexus
 
 set -e
 
-# Resolve through symlinks to find the real vault location
 SOURCE="${BASH_SOURCE[0]}"
 while [ -L "$SOURCE" ]; do
   DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
@@ -13,48 +12,30 @@ while [ -L "$SOURCE" ]; do
 done
 NEXUS_DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
 
-# Source helpers
 source "$NEXUS_DIR/cli/helpers.sh"
 
-# ── Help ─────────────────────────────────────────────────────────
 cmd_help() {
   echo ""
-  echo -e "  ${BOLD}nexus${NC} — project initializer + maintenance"
+  echo -e "  ${BOLD}nexus${NC} — automated project infrastructure"
   echo ""
-  echo -e "  ${BOLD}Setup${NC}"
-  echo -e "    ${GREEN}init${NC} [name]       Create or configure a project"
-  echo -e "    ${GREEN}add${NC}  <layer>      Add a layer: db, auth, api, hooks, ci"
-  echo ""
-  echo -e "  ${BOLD}Maintain${NC}"
-  echo -e "    ${GREEN}doctor${NC}            Run all maintenance checks"
-  echo -e "    ${GREEN}doctor${NC} --quick    Fast checks only (no network/DB)"
-  echo -e "    ${GREEN}doctor${NC} --fix      Auto-fix what it can"
-  echo -e "    ${GREEN}update${NC}            Sync project against latest vault templates"
-  echo ""
-  echo -e "  ${BOLD}Other${NC}"
-  echo -e "    ${GREEN}version${NC}           Show installed version"
-  echo -e "    ${GREEN}uninstall${NC}         Remove nexus (with optional package cleanup)"
+  echo -e "  ${GREEN}nexus${NC}                Run doctor (default)"
+  echo -e "  ${GREEN}nexus init${NC}           Drop self-maintaining infrastructure"
+  echo -e "  ${GREEN}nexus doctor${NC}         Checks + recommendations"
+  echo -e "  ${GREEN}nexus doctor --fix${NC}   Auto-fix what it can"
+  echo -e "  ${GREEN}nexus doctor --quick${NC} Fast checks (for hooks)"
+  echo -e "  ${GREEN}nexus update${NC}         Evolve project infrastructure"
+  echo -e "  ${GREEN}nexus version${NC}        Show version"
+  echo -e "  ${GREEN}nexus uninstall${NC}      Remove nexus"
   echo ""
 }
 
-# ── Dispatch ─────────────────────────────────────────────────────
 case "${1:-}" in
   init)       shift; source "$NEXUS_DIR/cli/init.sh"; cmd_init "$@" ;;
-  add)        shift;
-              case "${1:-}" in
-                db)    source "$NEXUS_DIR/cli/add-db.sh";    cmd_add_db ;;
-                auth)  source "$NEXUS_DIR/cli/add-auth.sh";  cmd_add_auth ;;
-                api)   source "$NEXUS_DIR/cli/add-api.sh";   cmd_add_api ;;
-                hooks) source "$NEXUS_DIR/cli/add-hooks.sh"; cmd_add_hooks ;;
-                ci)    source "$NEXUS_DIR/cli/add-ci.sh";    cmd_add_ci ;;
-                "")    echo -e "${RED}Usage: nexus add <db|auth|api|hooks|ci>${NC}" ;;
-                *)     echo -e "${RED}Unknown layer: $1${NC}. Options: db, auth, api, hooks, ci" ;;
-              esac ;;
   doctor)     shift; source "$NEXUS_DIR/cli/doctor.sh"; cmd_doctor "$@" ;;
   update)     source "$NEXUS_DIR/cli/update.sh"; cmd_update ;;
   version)    echo "nexus v$(cat "$NEXUS_DIR/VERSION" 2>/dev/null || echo "unknown")" ;;
   uninstall)  exec bash "$NEXUS_DIR/install.sh" --uninstall ;;
   help|--help|-h) cmd_help ;;
-  "")         cmd_help ;;
-  *)          echo -e "${RED}Unknown command: $1${NC}"; cmd_help ;;
+  "")         source "$NEXUS_DIR/cli/doctor.sh"; cmd_doctor ;;
+  *)          echo -e "  ${RED}Unknown: $1${NC}"; cmd_help ;;
 esac
