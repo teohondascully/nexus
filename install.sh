@@ -36,7 +36,12 @@ echo -e "${BOLD}╚════════════════════�
 echo ""
 echo -e "This will install Nexus to ${BOLD}~/.nexus${NC} and run bootstrap."
 echo ""
-read -p "Press Enter to continue (or Ctrl-C to cancel)..." < /dev/tty
+if [ -t 0 ]; then
+  read -p "Press Enter to continue (or Ctrl-C to cancel)..."
+else
+  printf "Press Enter to continue (or Ctrl-C to cancel)..."
+  read -r _ < /dev/tty
+fi
 
 echo ""
 
