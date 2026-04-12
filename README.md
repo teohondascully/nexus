@@ -1,6 +1,6 @@
 # nexus
 
-One-command dev environment + project initializer for macOS.
+One-command dev environment + automated project infrastructure for macOS.
 
 ```bash
 curl -fsSL https://www.teonnaise.com/install | bash
@@ -26,52 +26,75 @@ Before installing anything, press `i` at the welcome screen to see the full list
 
 ## The nexus CLI
 
-After installing, `nexus` is available from any directory. It's a project initializer + maintenance system:
+After installing, `nexus` is available from any directory. It's a project infrastructure system:
 
 ```
-nexus init [name]       Create or configure a project
-nexus add <layer>       Add a layer: db, auth, api, hooks, ci
-nexus doctor            Run all maintenance checks
-nexus doctor --quick    Fast checks only (no network/DB)
+nexus                   Runs doctor (default)
+nexus init              Zero questions. Drops self-maintaining infrastructure.
+nexus doctor            Checks + recommendations
 nexus doctor --fix      Auto-fix what it can
-nexus update            Sync project against latest vault templates
-nexus version           Show installed version
-nexus uninstall         Remove nexus (with optional package cleanup)
+nexus doctor --quick    Fast checks (for hooks)
+nexus update            Evolves project infrastructure + section-level migration
+nexus version           Show version
+nexus uninstall         Remove nexus
 ```
 
 ### `nexus init`
 
-Asks what you're building (web app or other), then drops convention files into your project:
+Zero questions. Drops self-maintaining infrastructure into your project:
 
 - **CLAUDE.md** with dependency direction, file structure (auto-synced), and conventions
-- **justfile** with standard commands (dev, test, build, doctor, db-reset, etc.)
+- **justfile** with standard commands (dev, test, build, doctor, etc.)
 - **Maintenance scripts** &mdash; env var sync, dependency direction linter, dead export detection, CLAUDE.md file-tree sync, startup validation
 - **lefthook** pre-commit hooks (typecheck, lint, env sync, dep direction)
 - **Claude Code hooks** (file-tree sync on write, doctor on stop)
 - **.gitignore**, **.env.example**, **.mise.toml**, **PR template**
 
-For web apps, optionally adds: Postgres + Drizzle, Clerk auth, tRPC + health endpoint, GitHub Actions CI.
-
 ### `nexus doctor`
 
-Runs 10 checks and reports a scorecard:
+Runs 7 checks and reports a scorecard with a recommendations tier:
 
 ```
   nexus doctor
 
   ok    CLAUDE.md file structure
   ok    .env.example coverage
-  ok    Dependency direction
-  FAIL  Dead exports (3 found)
-  ok    Startup validation
-  ok    Outdated dependencies
-  ok    lefthook installed
-  ok    Claude Code hooks present
-  ok    PR template present
-  ok    Nexus version (v1.0.0)
+  FAIL  Dependency direction (1 violation)
+          src/components/OrderList.tsx imports from src/services/orders.ts
+  ok    Hallucinated imports
+  ok    Dead exports
+  ok    Orphaned files
+  ok    Nexus v1.1.0
 
-  9/10 passed  1 issue(s) found
+  6/7 passed  1 failed
+
+  Recommendations
+   ~  No test runner. Run: pnpm add -D vitest
+   ~  TypeScript strict mode is off
+
+  2 recommendations
 ```
+
+### `nexus update`
+
+Syncs your project's infrastructure against the latest templates. Handles section-level CLAUDE.md migration — only updates sections that have changed, preserving project-specific content.
+
+## How it works
+
+The vault is the brain. Nexus compiles it into machine-enforceable artifacts. AI agents only see artifacts, not the vault.
+
+1. **Vault** — 50+ Obsidian notes encoding architecture patterns, conventions, and stack decisions
+2. **Artifacts** — `nexus init` compiles the vault into CLAUDE.md, justfile, scripts, and hook configs
+3. **Hooks** — three enforcement layers run continuously during development
+4. **Enforcement** — violations surface at commit time, not review time
+
+### Hook system
+
+Three enforcement layers work together:
+
+- **lefthook pre-commit** — typecheck, lint, env var sync, dependency direction on every commit
+- **Claude Code hooks** — file-tree sync on write, `nexus doctor --quick` on session stop
+- **justfile** — `just doctor` runs the full check suite on demand
 
 ### Updating nexus
 
@@ -81,7 +104,7 @@ Re-run the install command. It detects the existing install, compares versions, 
 curl -fsSL https://www.teonnaise.com/install | bash
 ```
 
-Or sync your project's nexus files against the latest templates:
+Or evolve your project's infrastructure against the latest templates:
 
 ```bash
 nexus update
@@ -94,59 +117,32 @@ Nexus is also an [Obsidian](https://obsidian.md) knowledge vault with 50+ interc
 | Section | What's in it |
 |---------|-------------|
 | **Foundations** | Architecture patterns, harness engineering, stack decisions, design principles |
-| **Tools & Meta** | AI coding tools, tool comparisons, workflow optimization |
+| **Tools** | AI coding tools, tool comparisons, workflow optimization |
 | **Templates** | CLAUDE.md starter, feature slice breakdown, checklists, scaffolds |
 | **Signals** | Tracked ecosystem changes with red/yellow/green classification |
 
 To browse the vault, install [Obsidian](https://obsidian.md) (free) and open the `~/.nexus` directory as a vault. Start with `HOME.md`.
 
-### How the vault works
-
 The vault separates **foundations** (patterns that don't change) from **tools** (things that rotate). When a tool gets replaced, the foundation pattern it serves stays the same.
-
-Notes link to each other via `[[wikilinks]]`. MOC (Map of Content) files in each section serve as entry points.
-
-### Keeping it current
-
-The vault includes an agent-driven update system. Run:
-
-```bash
-claude "Read VAULT_UPDATE_PROMPT.md. Run weekly audit."
-```
-
-This uses Claude Code to search the web, check for tool updates, and update stale notes. All changes go through `CHANGELOG.md` with human review flags.
-
-## Stack philosophy
-
-The vault documents many tools for **awareness** but only recommends a specific stack for **use**. The Stack Directory in Tools is the source of truth for what we actually build with. Everything else (Cursor, Copilot, Windsurf, etc.) is tracked so you know the landscape, not because you should use all of it.
-
-Changes to the recommended stack require explicit approval. The weekly audit updates version numbers and documents new features but does not swap recommendations.
 
 ## File structure
 
 ```
 nexus/
-├── nexus                     # CLI — project initializer + maintenance
-├── cli/                      # command implementations (init, add, doctor, update)
-├── init-templates/           # template files dropped into projects
-│   ├── core/                 # CLAUDE.md, justfile, gitignore, env, mise, PR template
-│   ├── scripts/              # maintenance scripts (env sync, dep direction, etc.)
-│   ├── hooks/                # lefthook + Claude Code hook configs
-│   ├── db/                   # Postgres + Drizzle templates
-│   ├── auth/                 # Clerk templates
-│   ├── api/                  # tRPC templates
-│   └── ci/                   # GitHub Actions workflow
-├── bootstrap.sh              # machine setup (idempotent, interactive)
-├── install.sh                # curl|bash entry point (smart update detection)
-├── VERSION                   # release version tracking
-├── HOME.md                   # vault entry point (open in Obsidian)
-├── foundations/              # architecture, harness engineering, stack decisions
-├── tools/                    # AI tools, comparisons, workflows
-├── templates/                # copy-paste scaffolds and checklists
-├── projects/                 # project specs and plans
-├── signals/                  # ecosystem tracking
-├── CHANGELOG.md              # all vault updates with dates
-└── VAULT_UPDATE_PROMPT.md    # agent prompt for weekly audits
+├── nexus                     # CLI entry point
+├── cli/                      # init, doctor, update, helpers
+├── templates/                # files dropped into projects by nexus init
+├── scripts/                  # maintenance scripts dropped into projects
+├── vault/                    # Obsidian knowledge vault (50+ notes)
+│   ├── HOME.md               # vault entry point
+│   ├── foundations/          # architecture, design principles
+│   ├── tools/                # AI tools, comparisons
+│   ├── templates/            # scaffolds and checklists
+│   └── signals/              # ecosystem tracking
+├── bootstrap.sh              # machine setup
+├── install.sh                # curl|bash entry point
+├── VERSION
+└── CHANGELOG.md
 ```
 
 ## License
