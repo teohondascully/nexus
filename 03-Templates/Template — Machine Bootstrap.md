@@ -103,6 +103,75 @@ ask() {
   [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]
 }
 
+# ── Audit Table ──────────────────────────────────────────────────
+show_audit() {
+  echo ""
+  echo -e "${BOLD}Full audit of everything this script installs:${NC}"
+  echo ""
+  echo -e "${BOLD}┌────────────────────┬──────────────────────┬────────────────────────────────────────────┬──────────┐${NC}"
+  echo -e "${BOLD}│ Tool               │ Source               │ What it does                               │ Required │${NC}"
+  echo -e "${BOLD}├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤${NC}"
+  echo -e "│ ${CYAN}xcode-select${NC}      │ Apple                │ git, clang, make — needed by everything    │ yes      │"
+  echo -e "│ ${CYAN}homebrew${NC}          │ brew.sh              │ macOS package manager                      │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}ghostty${NC}           │ ghostty.org          │ GPU-accelerated terminal (Zig)             │ yes      │"
+  echo -e "│ ${CYAN}starship${NC}          │ starship.rs          │ Fast shell prompt (Rust)                   │ yes      │"
+  echo -e "│ ${CYAN}JetBrains Mono${NC}    │ Nerd Fonts           │ Monospace font with ligatures + icons      │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}ripgrep${NC}           │ github/BurntSushi    │ grep replacement, 100x faster              │ yes      │"
+  echo -e "│ ${CYAN}bat${NC}               │ github/sharkdp       │ cat with syntax highlighting               │ yes      │"
+  echo -e "│ ${CYAN}eza${NC}               │ github/eza-community │ ls with icons, git status, tree            │ yes      │"
+  echo -e "│ ${CYAN}fd${NC}                │ github/sharkdp       │ find replacement, simpler + faster          │ yes      │"
+  echo -e "│ ${CYAN}zoxide${NC}            │ github/ajeetdsouza   │ Smart cd — learns your directories         │ yes      │"
+  echo -e "│ ${CYAN}fzf${NC}               │ github/junegunn      │ Fuzzy finder for files, history, branches  │ yes      │"
+  echo -e "│ ${CYAN}git-delta${NC}         │ github/dandavison     │ Beautiful syntax-highlighted git diffs      │ yes      │"
+  echo -e "│ ${CYAN}lazygit${NC}           │ github/jesseduffield  │ Terminal UI for git                        │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}atuin${NC}             │ atuin.sh             │ Shell history search, syncs across machines │ yes      │"
+  echo -e "│ ${CYAN}httpie${NC}            │ httpie.io            │ Human-friendly HTTP client                 │ yes      │"
+  echo -e "│ ${CYAN}jq${NC}               │ jqlang.github.io     │ Command-line JSON processor                │ yes      │"
+  echo -e "│ ${CYAN}yazi${NC}              │ github/sxyazi        │ Terminal file manager with preview          │ yes      │"
+  echo -e "│ ${CYAN}hyperfine${NC}         │ github/sharkdp       │ CLI benchmarking tool                      │ yes      │"
+  echo -e "│ ${CYAN}lazydocker${NC}        │ github/jesseduffield  │ Terminal UI for Docker                     │ yes      │"
+  echo -e "│ ${CYAN}tldr${NC}              │ tldr.sh              │ Simplified man pages with examples         │ yes      │"
+  echo -e "│ ${CYAN}btop${NC}              │ github/aristocratos   │ System monitor (CPU, mem, disk, network)   │ yes      │"
+  echo -e "│ ${CYAN}dust${NC}              │ github/bootandy      │ Disk usage analyzer                        │ yes      │"
+  echo -e "│ ${CYAN}dive${NC}              │ github/wagoodman      │ Docker image layer inspector               │ yes      │"
+  echo -e "│ ${CYAN}gh${NC}                │ cli.github.com       │ GitHub CLI — PRs, issues, CI from terminal │ yes      │"
+  echo -e "│ ${CYAN}just${NC}              │ github/casey          │ Modern command runner (replaces make)       │ yes      │"
+  echo -e "│ ${CYAN}raycast${NC}           │ raycast.com          │ App launcher, clipboard, window management  │ ${YELLOW}asks${NC}     │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}mise${NC}              │ mise.jdx.dev         │ Version manager (replaces nvm/pyenv/rbenv) │ yes      │"
+  echo -e "│ ${CYAN}node 24 LTS${NC}       │ nodejs.org (via mise)│ JavaScript runtime                         │ yes      │"
+  echo -e "│ ${CYAN}pnpm${NC}              │ pnpm.io              │ Fast, strict JS package manager             │ yes      │"
+  echo -e "│ ${CYAN}bun${NC}               │ bun.sh               │ Fast JS runtime + bundler + test runner     │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}python 3.12${NC}       │ python.org (via mise)│ Python runtime                             │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}uv${NC}                │ astral.sh            │ Fast Python package manager (Rust)          │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}ruff${NC}              │ astral.sh            │ Fast Python linter (Rust)                   │ ${YELLOW}asks${NC}     │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}docker${NC}            │ docker.com           │ Containerization platform                  │ ${YELLOW}asks${NC}     │"
+  echo -e "│ ${CYAN}claude-code${NC}       │ anthropic (via npm)  │ CLI AI coding agent                        │ yes      │"
+  echo -e "├────────────────────┼──────────────────────┼────────────────────────────────────────────┼──────────┤"
+  echo -e "│ ${CYAN}nexus CLI${NC}         │ this repo            │ Session launcher — assembles prompts        │ yes      │"
+  echo -e "${BOLD}└────────────────────┴──────────────────────┴────────────────────────────────────────────┴──────────┘${NC}"
+  echo ""
+  echo -e "${BOLD}Configs written${NC} ${DIM}(only if file doesn't already exist)${NC}${BOLD}:${NC}"
+  echo ""
+  echo -e "  ${CYAN}~/.config/ghostty/config${NC}          Terminal: Catppuccin theme, splits, transparency"
+  echo -e "  ${CYAN}~/.config/ghostty/themes/${NC}         Catppuccin Mocha (downloaded from GitHub)"
+  echo -e "  ${CYAN}~/.config/starship.toml${NC}           Prompt: minimal, gcloud/aws disabled"
+  echo -e "  ${CYAN}~/.config/mise/config.toml${NC}        Versions: node@24, python@3.12, auto_install"
+  echo -e "  ${CYAN}~/.gitconfig${NC}                      Git: delta pager, rebase, rerere, side-by-side"
+  echo -e "  ${CYAN}~/.zshrc${NC} ${DIM}(appended)${NC}              Aliases, tool integrations, yazi function"
+  echo ""
+  echo -e "${BOLD}Nothing is installed without your knowledge.${NC}"
+  echo -e "Items marked ${YELLOW}asks${NC} will prompt you before installing."
+  echo -e "Already-installed tools are skipped automatically."
+  echo ""
+  echo -e "${DIM}Source code: https://github.com/teo-eb/nexus/blob/main/bootstrap.sh${NC}"
+  echo ""
+}
+
 # ── Welcome ──────────────────────────────────────────────────────
 clear
 echo ""
@@ -131,7 +200,15 @@ echo -e "${BOLD}║${NC}  ${YELLOW}Optional steps will ask before installing.${N
 echo -e "${BOLD}║${NC}                                                          ${BOLD}║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
-read -p "Press Enter to start (or Ctrl+C to cancel)..."
+echo -e "  Press ${BOLD}Enter${NC} to start    ${DIM}│${NC}    Press ${BOLD}i${NC} to inspect everything first"
+read -n 1 -r
+echo ""
+
+if [[ $REPLY == "i" || $REPLY == "I" ]]; then
+  show_audit
+  echo -e "  Press ${BOLD}Enter${NC} to continue with install    ${DIM}│${NC}    ${BOLD}Ctrl+C${NC} to cancel"
+  read -r
+fi
 
 # ═════════════════════════════════════════════════════════════════
 # STEP 1: Xcode Command Line Tools
