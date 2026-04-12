@@ -4,7 +4,7 @@
 // Called by nexus doctor
 
 import { readFileSync, readdirSync, statSync } from "fs";
-import { join, relative, basename, dirname } from "path";
+import { join, relative, basename } from "path";
 
 const root = process.cwd();
 
@@ -68,7 +68,6 @@ function isConventionFile(filePath: string): boolean {
 function isReferencedByOtherFile(filePath: string, allFiles: string[]): boolean {
   const rel = relative(root, filePath);
   const nameNoExt = basename(filePath).replace(/\.(ts|tsx|js|jsx)$/, "");
-  const dirName = basename(dirname(filePath));
 
   for (const other of allFiles) {
     if (other === filePath) continue;

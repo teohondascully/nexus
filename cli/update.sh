@@ -3,6 +3,14 @@
 
 cmd_update() {
   set +e
+
+  if [ ! -d ".git" ]; then
+    echo ""
+    echo -e "  ${RED}Not a git repository.${NC} Run nexus update from inside a project."
+    echo ""
+    return 1
+  fi
+
   echo ""
   echo -e "  ${BOLD}nexus update${NC}"
 
@@ -148,7 +156,7 @@ cmd_update() {
   # ── Apply ──────────────────────────────────────────────────────
   echo ""
   printf "  Apply? [Y/n/diff]: "
-  read -r apply_choice || true
+  read -r apply_choice < /dev/tty || true
 
   case "${apply_choice:-y}" in
     [dD])
@@ -180,7 +188,7 @@ cmd_update() {
         done
       fi
       printf "  Apply these? [Y/n]: "
-      read -r apply_final || true
+      read -r apply_final < /dev/tty || true
       [[ "${apply_final:-y}" =~ ^[nN]$ ]] && return 0
       ;;
     [nN]) return 0 ;;

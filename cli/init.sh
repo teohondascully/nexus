@@ -55,17 +55,14 @@ cmd_init() {
     mkdir -p .claude
     if [ -d "$HOME/.claude/plugins" ] && ls "$HOME/.claude/plugins" 2>/dev/null | grep -q superpowers; then
       # Strip onStop block — Superpowers handles it
-      grep -v '"onStop"' "$TEMPLATES/claude-settings.json" | \
-        grep -v 'nexus doctor' | \
-        grep -v '"command":' | \
-        python3 -c "
+      python3 -c "
 import sys, json
-data = json.load(sys.stdin)
-data.pop('hooks', {}).pop('onStop', None)
-# Rebuild clean
-out = {'hooks': {'PostToolUse': data.get('hooks', {}).get('PostToolUse', [])}}
-json.dump(out, sys.stdout, indent=2)
-" > .claude/settings.json 2>/dev/null || cp "$TEMPLATES/claude-settings.json" .claude/settings.json
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+if 'hooks' in data and 'onStop' in data['hooks']:
+    del data['hooks']['onStop']
+json.dump(data, sys.stdout, indent=2)
+" "$TEMPLATES/claude-settings.json" > .claude/settings.json 2>/dev/null || cp "$TEMPLATES/claude-settings.json" .claude/settings.json
       echo -e "  ${GREEN}created${NC} settings.json ${DIM}(superpowers mode)${NC}"
     else
       cp "$TEMPLATES/claude-settings.json" .claude/settings.json
@@ -98,7 +95,7 @@ json.dump(out, sys.stdout, indent=2)
   # ── Summary ─────────────────────────────────────────────────────
   echo ""
   printf "  Commit? [Y/n]: "
-  read -r commit_ans || true
+  read -r commit_ans < /dev/tty || true
   if [ "${commit_ans:-y}" != "n" ] && [ "${commit_ans:-y}" != "N" ]; then
     git add -A
     git commit -m "chore: initialize project with nexus" --quiet 2>/dev/null || true
