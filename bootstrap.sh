@@ -171,7 +171,7 @@ echo -e "   ${BOLD} 4${NC}  Modern CLI tools     ${BOLD}10${NC}  Claude Code"
 echo -e "   ${BOLD} 5${NC}  Advanced CLI tools   ${BOLD}11${NC}  Git config"
 echo -e "   ${BOLD} 6${NC}  mise                 ${BOLD}12${NC}  Shell config"
 echo ""
-echo -e "  ${GREEN}Safe to re-run.${NC} ${DIM}github.com/teohondascully/nexus${NC}"
+echo -e "  ${GREEN}Safe to re-run. Fully reversible.${NC} ${DIM}Run nexus uninstall for details.${NC}"
 echo ""
 printf "  Enter to start · i to inspect · Ctrl-C to cancel "
 read -n 1 -r REPLY < /dev/tty

@@ -4,6 +4,31 @@
 
 ---
 
+## 2026-04-12 — Nexus v2.0.0: Automated Project Infrastructure
+**Agent:** Claude Code (Opus 4.6, 1M context)
+**Trigger:** Manual — full v2 rewrite
+
+### What Changed
+Complete rewrite from project scaffolder to automated project infrastructure:
+
+- **Zero-question init** — `nexus init` drops self-maintaining conventions into any project (CLAUDE.md with section markers, 7 maintenance scripts, pre-commit hooks, Claude Code hooks, justfile, configs). No wizard, no stack questions.
+- **Doctor with recommendations** — 7 pass/fail checks + 9 informational recommendations. `--fix` auto-repairs what it can. `--quick` runs 4 fast checks for hook/CI use.
+- **Section-level CLAUDE.md migration** — `nexus update` uses `<!-- nexus:name -->` / `<!-- nexus:end -->` markers to update nexus-owned sections while preserving user-owned sections.
+- **New detection scripts** — `check-hallucinated-imports.ts` (packages in code but not package.json), `check-orphaned-files.ts` (files nothing imports)
+- **Full undo path** — `nexus uninstall` now shows tier 3 config undo guide (shell, terminal, prompt, runtimes, git)
+- **Vault reorganization** — vault files moved under `vault/` for clean separation. Scripts moved to `scripts/`. Templates moved to `templates/`.
+
+### Deleted from v1
+- `nexus add` command and all add-* scripts (db, auth, api, hooks, ci)
+- `init-templates/` directory (27 files across core/, hooks/, db/, auth/, api/, ci/)
+- Interactive init wizard (project type, stack questions)
+- Web-app/other CLAUDE.md template split
+
+### Files Modified
+`nexus`, `cli/helpers.sh`, `cli/init.sh`, `cli/doctor.sh`, `cli/update.sh`, `install.sh`, `bootstrap.sh`, `README.md`, `VERSION`, `CHANGELOG.md`, plus new `templates/` (8 files), `scripts/` (2 new), `vault/` (moved)
+
+---
+
 ## 2026-04-12 — Nexus CLI Redesign + Vault Sync
 **Agent:** Claude Code (Opus 4.6, 1M context)
 **Trigger:** Manual — full CLI rewrite + documentation sync

@@ -5,6 +5,11 @@
         "matcher": "Write|Edit",
         "command": "bash scripts/sync-claude-md.sh 2>/dev/null || true"
       }
+    ],
+    "onStop": [
+      {
+        "command": "nexus doctor --quick 2>/dev/null || true"
+      }
     ]
   }
 }

@@ -1,0 +1,19 @@
+# justfile — project commands
+# Run with: just <command>
+
+# ── Dev ──────────────────────────────────────────────────
+dev:
+    echo "Configure: just --edit → replace this with your dev command"
+
+build:
+    echo "Configure: just --edit → replace this with your build command"
+
+test:
+    echo "Configure: just --edit → replace this with your test command"
+
+# ── Quality (managed by nexus) ───────────────────────────
+doctor:
+    nexus doctor
+
+doctor-fix:
+    nexus doctor --fix

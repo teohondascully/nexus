@@ -23,7 +23,8 @@ resolve_vault_dir() {
 }
 
 VAULT_DIR="$(resolve_vault_dir)"
-TEMPLATES="$VAULT_DIR/init-templates"
+TEMPLATES="$VAULT_DIR/templates"
+SCRIPTS="$VAULT_DIR/scripts"
 
 # ── Prereq Checks ───────────────────────────────────────────────
 has_cmd() {
@@ -151,4 +152,75 @@ append_to_file() {
 
   echo "$content" >> "$file"
   return 0
+}
+
+# ── Silent File Drop (for init — no interactive prompt) ──────────
+drop_file_silent() {
+  local src="$1"
+  local dest="$2"
+  mkdir -p "$(dirname "$dest")"
+
+  if [ -f "$dest" ]; then
+    print_skip "$(basename "$dest") (already exists)"
+    return 1
+  fi
+
+  cp "$src" "$dest"
+  update_checksum "$dest"
+  echo -e "  ${GREEN}created${NC} $(basename "$dest")"
+  return 0
+}
+
+# ── CLAUDE.md Section Migration ─────────────────────────────────
+# Parses nexus-owned sections from a CLAUDE.md file
+# Returns lines of "section_name" for each <!-- nexus:name --> found
+parse_nexus_sections() {
+  local file="$1"
+  grep -o '<!-- nexus:\([a-z-]*\) -->' "$file" 2>/dev/null | grep -v 'nexus:end' | sed 's/<!-- nexus:\(.*\) -->/\1/'
+}
+
+# Extracts content between <!-- nexus:name --> and <!-- nexus:end -->
+extract_section() {
+  local file="$1"
+  local name="$2"
+  awk -v name="$name" '
+    $0 ~ "<!-- nexus:" name " -->" { found=1; next }
+    /<!-- nexus:end -->/ { if(found) { found=0; next } }
+    found { print }
+  ' "$file"
+}
+
+# Replaces a nexus-owned section in a file with new content
+replace_section() {
+  local file="$1"
+  local name="$2"
+  local new_content="$3"
+
+  # Write content to temp file to avoid awk -v multiline/escape issues
+  local tmpfile
+  tmpfile=$(mktemp)
+  printf '%s\n' "$new_content" > "$tmpfile"
+
+  awk -v name="$name" -v tmpfile="$tmpfile" '
+    $0 ~ "<!-- nexus:" name " -->" {
+      print
+      while ((getline line < tmpfile) > 0) print line
+      close(tmpfile)
+      skip=1
+      next
+    }
+    /<!-- nexus:end -->/ { if(skip) { print; skip=0; next } }
+    !skip { print }
+  ' "$file" > "$file.tmp"
+  rm -f "$tmpfile"
+  mv "$file.tmp" "$file"
+}
+
+# Appends a new nexus section to the end of CLAUDE.md
+append_section() {
+  local file="$1"
+  local name="$2"
+  local content="$3"
+
+  printf "\n<!-- nexus:%s -->\n%s\n<!-- nexus:end -->\n" "$name" "$content" >> "$file"
 }
