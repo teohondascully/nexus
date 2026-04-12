@@ -168,7 +168,7 @@ show_audit() {
   echo -e "Items marked ${YELLOW}asks${NC} will prompt you before installing."
   echo -e "Already-installed tools are skipped automatically."
   echo ""
-  echo -e "${DIM}Source code: https://github.com/teo-eb/nexus/blob/main/bootstrap.sh${NC}"
+  echo -e "${DIM}Source code: https://github.com/teohondascully/nexus/blob/main/bootstrap.sh${NC}"
   echo ""
 }
 

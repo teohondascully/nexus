@@ -3,7 +3,7 @@
 # Nexus — One-command dev environment setup
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/teo-eb/nexus/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/teohondascully/nexus/main/install.sh | bash
 #
 # What this does:
 #   1. Clones the Nexus vault to ~/.nexus
@@ -16,7 +16,7 @@
 set -e
 
 # ── Config ───────────────────────────────────────────────────────
-REPO="https://github.com/teo-eb/nexus.git"
+REPO="https://github.com/teohondascully/nexus.git"
 INSTALL_DIR="$HOME/.nexus"
 BIN_DIR="$HOME/.local/bin"
 
@@ -31,7 +31,7 @@ NC='\033[0m'
 echo ""
 echo -e "${BOLD}╔══════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}║         Nexus — Dev Environment          ║${NC}"
-echo -e "${BOLD}║        https://github.com/teo-eb/nexus   ║${NC}"
+echo -e "${BOLD}║        https://github.com/teohondascully/nexus   ║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
