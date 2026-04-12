@@ -1,4 +1,4 @@
-# 🏗️ Foundations MOC
+# Foundations
 
 > Patterns that are universal across every serious product. These don't change when the next framework drops.
 
@@ -11,8 +11,8 @@
 
 ## Architecture (Layers 1-15)
 - [[The 15 Universal Layers]] — the foundation blueprint (every product converges here)
-- [[The Pre-Build Interrogation]] — 5 questions before touching code
-- [[The Audit Checklist]] — does this look like a 50-person team built it?
+- [[Template — Pre-Build Interrogation]] — 5 questions before touching code
+- [[Template — Audit Checklist]] — does this look like a 50-person team built it?
 - [[Monorepo Patterns]] — structure, tooling, type flow
 
 ## Harness Engineering

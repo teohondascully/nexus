@@ -1,11 +1,11 @@
-# 🚀 Projects MOC
+# Projects
 
 > Every project is practice for the real thing. Each one should make the next faster and test a Foundation pattern.
 
 ---
 
 ## Active Projects
-<!-- Link each project note here as you start them -->
+- [[Signal Scraper Project]] — automated signal pipeline for ecosystem tracking
 
 ## Project Note Template
 
@@ -21,7 +21,7 @@ When starting a new project, create a note with:
 <!-- What Foundation pattern am I practicing? What skill am I building? -->
 
 ## Stack Decisions
-<!-- Link to Tools MOC entries -->
+<!-- Link to Tools entries -->
 
 ## Pre-Build Interrogation
 <!-- Answer the 5 questions from Phase 0 -->
@@ -45,7 +45,7 @@ When starting a new project, create a note with:
 - **Core loop:** Sources publish → scraper captures → I review digest
 - **Practices:** Background jobs, API integration, scheduled tasks, data pipeline
 - **Stack:** Next.js + Inngest + Postgres + RSS/API ingestion
-- **See:** [[🗺️ Signals MOC#Future Automated Signal Pipeline]]
+- **See:** [[Signals#Future Automated Signal Pipeline]]
 
 ### Portfolio / Personal Site
 - **Core loop:** Visitor arrives → sees work → understands capability

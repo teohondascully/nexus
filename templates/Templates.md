@@ -1,4 +1,4 @@
-# 📋 Templates MOC
+# Templates
 
 > Copy-paste scaffolds for new projects and recurring workflows. Every template links back to the Foundation layer it implements.
 

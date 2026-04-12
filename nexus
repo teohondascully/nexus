@@ -14,9 +14,9 @@ while [ -L "$SOURCE" ]; do
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
 VAULT_DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
-TEMPLATES="$VAULT_DIR/03-Templates"
-TOOLS="$VAULT_DIR/02-Tools-and-Meta"
-FOUNDATIONS="$VAULT_DIR/01-Foundations"
+TEMPLATES="$VAULT_DIR/templates"
+TOOLS="$VAULT_DIR/tools"
+FOUNDATIONS="$VAULT_DIR/foundations"
 
 # ── Colors ───────────────────────────────────────────────────────
 RED='\033[0;31m'

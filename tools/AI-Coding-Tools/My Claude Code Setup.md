@@ -91,7 +91,7 @@ For tasks that span multiple sessions:
 ---
 
 ## Tracking What's New
-Tools in this space change fast. Check [[🗺️ Signals MOC]] for:
+Tools in this space change fast. Check [[Signals]] for:
 - New Claude Code features (hooks, MCP support, context window changes)
 - Alternative wrappers and when they're better
 - Community workflows from r/vibecoding and HN

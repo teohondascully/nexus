@@ -14,14 +14,14 @@
 
 ### Process (5 min)
 For anything interesting, classify:
-- 🔴 **Meta shift** — changes how I build → write a [[🗺️ Foundations MOC|Foundations]] note
-- 🟡 **Tool update** — new version, new tool, deprecation → update [[🗺️ Tools MOC|Tools MOC]] table
-- 🟢 **Interesting but not actionable** → tag and file in `00-Inbox/` or delete
+- [red] **Meta shift** — changes how I build → write a [[Foundations|Foundations]] note
+- [yellow] **Tool update** — new version, new tool, deprecation → update [[Tools|Tools]] table
+- [green] **Interesting but not actionable** → tag and file in `inbox/` or delete
 
 ### Act (5 min)
-- [ ] Update the [[🗺️ Tools MOC#Stack Directory|Stack Directory]] if any tools changed
-- [ ] Add entries to the [[🗺️ Signals MOC#Signal Log|Signal Log]]
-- [ ] If a 🔴 meta shift: does any template need updating?
+- [ ] Update the [[Tools#Stack Directory|Stack Directory]] if any tools changed
+- [ ] Add entries to the [[Signals#Signal Log|Signal Log]]
+- [ ] If a [red] meta shift: does any template need updating?
 
 ### Questions to Ask
 - Is there a tool I'm using that now has a clearly better alternative?

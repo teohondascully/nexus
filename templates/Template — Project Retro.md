@@ -53,8 +53,8 @@ Which layers from [[The 15 Universal Layers]] did I implement? Rate each:
 ### Insights to Feed Back
 - [ ] Update Foundations notes with new patterns learned
 - [ ] Update Templates with improvements discovered
-- [ ] Update Tools MOC if tool opinions changed
-- [ ] Add to [[🗺️ Signals MOC#Signal Log|Signal Log]] if relevant
+- [ ] Update Tools if tool opinions changed
+- [ ] Add to [[Signals#Signal Log|Signal Log]] if relevant
 
 ---
 

@@ -42,7 +42,7 @@ Choose between Claude Sonnet 4.6, Google Gemini 2.0 Flash, GPT-5.4, and other mo
 | Business | $19/user/mo |
 | Enterprise | $39/user/mo |
 
-> ⚠️ **Data policy change (April 24, 2026):** Interaction data from Free, Pro, and Pro+ users will be used to train AI models unless you opt out.
+> Note: **Data policy change (April 24, 2026):** Interaction data from Free, Pro, and Pro+ users will be used to train AI models unless you opt out.
 
 ## Best For
 - Teams already on GitHub with existing CI/CD

@@ -268,7 +268,7 @@ Push to main → Lint → Type check → Test → Build → Deploy to staging (a
 ## Related
 - [[Template — Pre-Build Interrogation]] — Phase 0, before you touch these layers
 - [[Template — Audit Checklist]] — Phase 3, verify all layers before shipping
-- [[🗺️ Tools MOC]] — current best-in-class tool for each layer
+- [[Tools]] — current best-in-class tool for each layer
 
 ---
 

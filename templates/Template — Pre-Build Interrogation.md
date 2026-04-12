@@ -73,7 +73,7 @@
 
 ## Now What?
 1. Write your [[Template — CLAUDE.md|CLAUDE.md]] based on these answers
-2. Build [[The 15 Universal Layers|Foundation layers]] in the [[🗺️ Foundations MOC#Build Sequence|build sequence]]
+2. Build [[The 15 Universal Layers|Foundation layers]] in the [[Foundations#Build Sequence|build sequence]]
 3. Start with Layer 1 (repo structure) and work down
 
 ---

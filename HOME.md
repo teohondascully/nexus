@@ -1,32 +1,32 @@
-# 🧠 Builder's Brain
+# Nexus
 
-> The goal: internalize the universal patterns so deeply that when it's time to found, I'm not learning — I'm executing.
+> Internalize the universal patterns so deeply that when it's time to found, you're not learning — you're executing.
 
-**Start here:** [[01-Foundations/The Full Pipeline|The Full Pipeline]] — the complete map from opening your laptop to shipping production code.
+**Start here:** [[foundations/The Full Pipeline|The Full Pipeline]] — the complete map from opening your laptop to shipping production code.
 
 ---
 
 ## Maps of Content
 
-### [[01-Foundations/🗺️ Foundations MOC|🏗️ Foundations]]
+### [[foundations/Foundations|Foundations]]
 The universal layers from dev environment setup through system architecture. Layer -1 (your machine) through Layer 15 (analytics). The stuff that doesn't change with the next framework release.
 
-### [[02-Tools-and-Meta/🗺️ Tools MOC|🔧 Tools & Meta]]
+### [[tools/Tools|Tools & Meta]]
 The current best-in-class tools, frameworks, and workflows. What's hot, what's proven, what's hype. This layer changes — Foundations don't.
 
-### [[03-Templates/🗺️ Templates MOC|📋 Templates]]
+### [[templates/Templates|Templates]]
 Repeatable scaffolds, checklists, and interrogation frameworks. Copy-paste into a new project and go.
 
-### [[04-Projects/🗺️ Projects MOC|🚀 Projects]]
+### [[projects/Projects|Projects]]
 Active and past builds. Each project links back to which Foundation patterns and Tools it uses.
 
-### [[05-News-and-Signals/🗺️ Signals MOC|📡 Signals]]
+### [[signals/Signals|Signals]]
 AI news, framework releases, paradigm shifts. Raw signal → processed insight → action item.
 
 ---
 
 ## Quick Capture
-- Use `00-Inbox/` for anything unprocessed — screenshots, links, half-thoughts
+- Use `inbox/` for anything unprocessed — screenshots, links, half-thoughts
 - Process inbox weekly: tag it, link it, or delete it
 - If it doesn't connect to Foundations, Tools, or a Project, it's noise
 

@@ -19,7 +19,7 @@
 ### 3. Core Entities
 1. **Sources** — RSS feeds, API endpoints (Reddit, HN, Twitter)
 2. **Entries** — raw captured items (title, url, content snippet, source, timestamp)
-3. **Digests** — daily summaries with classified entries (🔴🟡🟢)
+3. **Digests** — daily summaries with classified entries ([red][yellow][green])
 4. **Filters** — keyword rules, source weights, classification criteria
 5. **Notes** — my annotations on entries (links to Obsidian notes)
 
@@ -63,7 +63,7 @@
 ### V2 (add intelligence)
 - [ ] Reddit API integration (r/vibecoding, r/LocalLLaMA)
 - [ ] HN Algolia API integration (trending posts)
-- [ ] LLM classification: 🔴 meta shift / 🟡 tool update / 🟢 noise
+- [ ] LLM classification: [red] meta shift / [yellow] tool update / [green] noise
 - [ ] Daily digest email via Resend
 - [ ] Mark entries as read/starred/archived
 
@@ -120,7 +120,7 @@ const watchlist = [
 ---
 
 ## Related
-- [[🗺️ Signals MOC]] — where the output of this project goes
+- [[Signals]] — where the output of this project goes
 - [[Template — Pre-Build Interrogation]] — Phase 0 applied here
 - [[The 15 Universal Layers]] — which layers this project practices
 - [[The Full Pipeline]] — this project follows the full pipeline

@@ -1,15 +1,21 @@
-# 🔧 Tools & Meta MOC
+# Tools
 
-> The current best-in-class. This layer changes — [[🗺️ Foundations MOC|Foundations]] don't. When a tool here gets replaced, the Foundation pattern it serves stays the same.
+> The current best-in-class. This layer changes — [[Foundations|Foundations]] don't. When a tool here gets replaced, the Foundation pattern it serves stays the same.
+
+> **Policy:** The Stack Directory below is **our stack** — what we actually build with. AI coding tool notes and Beyond the Basics document the **landscape** for awareness. Tracking a tool doesn't mean recommending it. Changes to our stack require explicit approval.
 
 ---
 
 ## AI Coding Tools
+
+**Our pick:**
 - [[Claude Code]] — CLI agent + VS Code (beta), 1M context, hooks, CLAUDE.md, MCP, /loop, checkpoints, Computer Use
-- [[Superpowers (GSD)]] — Claude Code wrapper with enhanced workflows
+
+**Landscape (tracked for awareness, not recommendations):**
 - [[Cursor]] — IDE with Cursor 3.0 agents, .cursor/rules/, Design Mode
 - [[GitHub Copilot]] — AGENTS.md, agent mode GA, Copilot CLI, Autopilot, cloud agent, .agent.md
-- [[Tool Comparison Matrix]] — when to use which
+- [[Superpowers (GSD)]] — Claude Code wrapper with enhanced workflows
+- [[Tool Comparison Matrix]] — full landscape comparison
 
 ## Current Meta (April 2026)
 - [[Beyond the Basics]] — IFYKYK tools, browser choice, Claude plans, multi-agent strategies, niche picks
@@ -44,7 +50,7 @@
 | Feature Flags | PostHog | Flagsmith | Layer 13 |
 | Search | Typesense | Algolia | Layer 14 |
 
-> ⚠️ Review this table quarterly. Tools rotate; patterns don't.
+> Note: Review this table quarterly. Tools rotate; patterns don't.
 
 ## Dev Environment Stack (Layer -1)
 > See [[The Developer Machine]] for the full setup guide.

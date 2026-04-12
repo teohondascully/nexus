@@ -205,7 +205,7 @@ echo "Done. Restart your terminal."
 ## Related
 - [[The Developer Machine]] — the full machine setup
 - [[Docker for Local Dev]] — containerize services
-- [[🗺️ Tools MOC]] — where these fit in the stack
+- [[Tools]] — where these fit in the stack
 
 ---
 

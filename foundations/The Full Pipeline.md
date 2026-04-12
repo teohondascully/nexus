@@ -21,7 +21,7 @@ MACHINE SETUP (do once)
 ├─ Editor ────────────── Cursor (visual) + Claude Code (agentic)
 └─ Git Config ────────── delta as pager, rebase on pull, rerere
 │
-│  📋 [[Template — Machine Bootstrap]]
+│  → [[Template — Machine Bootstrap]]
 │
 ───────────────────────────────────────────────────
 │
@@ -34,7 +34,7 @@ NEW PROJECT (do per project)
 │  ├─ Q4: What are the failures? ─── Which ones would kill you?
 │  └─ Q5: Deployment topology? ───── Monolith. Always start monolith.
 │
-│  📋 [[Template — Pre-Build Interrogation]]
+│  → [[Template — Pre-Build Interrogation]]
 │
 ├─ Phase 1: Foundation (1-2 days first time, afternoon by third project)
 │  │
@@ -57,9 +57,9 @@ NEW PROJECT (do per project)
 │  ├─ Docker: services in docker-compose.yml (Postgres, Redis, Mailpit)
 │  └─ Harness: CLAUDE.md + hooks + .mise.toml at project root
 │
-│  📋 [[Template — Monorepo Scaffold]]
-│  📋 [[Template — CLAUDE.md]]
-│  📋 [[Template — Database Schema Starter]]
+│  → [[Template — Monorepo Scaffold]]
+│  → [[Template — CLAUDE.md]]
+│  → [[Template — Database Schema Starter]]
 │
 ├─ Phase 2: Build (the actual product)
 │  │
@@ -84,9 +84,9 @@ NEW PROJECT (do per project)
 │     ├─ Level 3: + PROGRESS.md + shift handoff ── multi-session work
 │     └─ Level 4: + CI gates + preview deploys ── enterprise-grade
 │
-│  📋 [[Template — Feature Slice Breakdown]]
-│  📋 [[Session Workflow]]
-│  📋 [[Prompt Patterns That Work]]
+│  → [[Template — Feature Slice Breakdown]]
+│  → [[Session Workflow]]
+│  → [[Prompt Patterns That Work]]
 │
 ├─ Phase 3: Audit
 │  │
@@ -96,8 +96,8 @@ NEW PROJECT (do per project)
 │  ├─ Can you roll back a bad deploy in 2 minutes?
 │  └─ Is the core loop covered by E2E tests?
 │
-│  📋 [[Template — Audit Checklist]]
-│  📋 [[Template — PR Review Checklist]]
+│  → [[Template — Audit Checklist]]
+│  → [[Template — PR Review Checklist]]
 │
 ├─ Phase 4: Ship
 │  │
@@ -108,7 +108,7 @@ NEW PROJECT (do per project)
 │  ├─ Analytics funnels tracking core loop
 │  └─ Rollback plan documented
 │
-│  📋 [[Template — Launch Checklist]]
+│  → [[Template — Launch Checklist]]
 │
 └─ Phase 5: Learn
    │
@@ -117,18 +117,18 @@ NEW PROJECT (do per project)
    ├─ Update Templates with improvements
    └─ Next project starts faster
    
-   📋 [[Template — Project Retro]]
+   → [[Template — Project Retro]]
 
 ───────────────────────────────────────────────────
 
 ONGOING (weekly)
 │
 ├─ 15-min signal scan: r/vibecoding, HN, RSS feeds
-├─ Classify: meta shift (🔴) vs tool update (🟡) vs noise (🟢)
-├─ Update Tools MOC if anything changed
+├─ Classify: meta shift ([red]) vs tool update ([yellow]) vs noise ([green])
+├─ Update Tools if anything changed
 └─ Process Obsidian inbox
    
-   📋 [[Template — Weekly Tools Review]]
+   → [[Template — Weekly Tools Review]]
 ```
 
 ---

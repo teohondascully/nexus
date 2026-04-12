@@ -79,7 +79,7 @@ async function seed() {
   // Add 50 sample records for pagination/search testing
   // ...
 
-  console.log('✅ Seed complete');
+  console.log('Seed complete');
 }
 
 seed().catch(console.error);

@@ -84,7 +84,7 @@ The AI coding tool space moves fast. Things that could shift this matrix:
 - **Cursor's credit model** — if pricing stabilizes, Cursor 3.0's agent features (/worktree, /best-of-n) rival Claude Code for IDE-first workflows.
 - **Node.js 26** — releasing April 22. Last under old cadence before one-major-per-year shift.
 
-Track shifts in [[🗺️ Signals MOC]].
+Track shifts in [[Signals]].
 
 ---
 

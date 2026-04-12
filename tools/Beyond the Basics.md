@@ -244,7 +244,7 @@ Replace: Spotlight + Rectangle + clipboard managers
 - [[Tool Comparison Matrix]] — AI coding tools specifically
 - [[The Developer Machine]] — full machine setup
 - [[Version and Runtime Management]] — mise, uv, Bun
-- [[🗺️ Tools MOC]]
+- [[Tools]]
 
 ---
 

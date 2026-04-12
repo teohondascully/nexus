@@ -1,4 +1,4 @@
-# 📡 Signals MOC
+# 📡 Signals
 
 > Raw signal → processed insight → action item. If it doesn't change how I build, it's noise.
 
@@ -7,14 +7,14 @@
 ## Signal Processing Workflow
 
 ```
-1. CAPTURE — screenshot, link, or note in 00-Inbox/
+1. CAPTURE — screenshot, link, or note in inbox/
 2. CLASSIFY — is this a:
    - 🔴 Meta shift (changes HOW I build — e.g., harness engineering)
    - 🟡 Tool update (new version, new tool, deprecation)
    - 🟢 Interesting but not actionable (cool demo, research paper)
 3. PROCESS
    - 🔴 → Write a Foundations note, update Templates if needed
-   - 🟡 → Update Tools MOC table, test it, write impressions
+   - 🟡 → Update Tools table, test it, write impressions
    - 🟢 → Tag and file, or delete
 4. ACT — what changes in my next project?
 ```
@@ -36,7 +36,7 @@
 
 ## Future: Automated Signal Pipeline
 > Build a scraper/agent that monitors these sources and surfaces relevant updates.
-> See [[04-Projects/Signal Scraper Project|Signal Scraper Project]] for the build plan.
+> See [[Signal Scraper Project]] for the build plan.
 
 **MVP approach:**
 - RSS feeds for blogs (Anthropic, OpenAI, Vercel, Martin Fowler)

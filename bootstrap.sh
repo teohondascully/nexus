@@ -3,7 +3,7 @@
 # Machine Bootstrap — Interactive Dev Environment Setup
 # Last updated: 2026-04-11
 # Safe to re-run: skips anything already installed
-# Reference: https://github.com/YOUR_USER/dotfiles
+# Reference: https://github.com/teohondascully/nexus
 # ================================================================
 set -e
 trap 'echo ""; echo "Cancelled."; exit 1' INT
