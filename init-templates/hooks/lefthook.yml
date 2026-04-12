@@ -5,10 +5,10 @@ pre-commit:
   parallel: true
   commands:
     typecheck:
-      run: pnpm typecheck 2>/dev/null || echo "typecheck not configured — skipping"
+      run: "[ -f package.json ] && pnpm typecheck || true"
     lint:
-      run: pnpm lint 2>/dev/null || echo "lint not configured — skipping"
+      run: "[ -f package.json ] && pnpm lint || true"
     env-sync:
       run: bash scripts/check-env-sync.sh
     deps-direction:
-      run: bun scripts/check-deps-direction.ts 2>/dev/null || echo "bun not found — skipping deps check"
+      run: "[ -f scripts/check-deps-direction.ts ] && bun scripts/check-deps-direction.ts || true"
