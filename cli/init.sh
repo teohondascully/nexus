@@ -87,6 +87,11 @@ json.dump(data, sys.stdout, indent=2)
     bash scripts/sync-claude-md.sh 2>/dev/null && echo -e "  ${GREEN}synced${NC} CLAUDE.md file structure" || true
   fi
 
+  # Trust mise config if available
+  if has_cmd mise && [ -f ".mise.toml" ]; then
+    mise trust > /dev/null 2>&1 && echo -e "  ${GREEN}trusted${NC} .mise.toml" || true
+  fi
+
   # Install lefthook if available
   if has_cmd lefthook && [ -f "lefthook.yml" ]; then
     lefthook install > /dev/null 2>&1 && echo -e "  ${GREEN}activated${NC} pre-commit hooks" || true
