@@ -176,7 +176,7 @@ drop_file_silent() {
 # Returns lines of "section_name" for each <!-- nexus:name --> found
 parse_nexus_sections() {
   local file="$1"
-  grep -o '<!-- nexus:\([a-z-]*\) -->' "$file" 2>/dev/null | sed 's/<!-- nexus:\(.*\) -->/\1/'
+  grep -o '<!-- nexus:\([a-z-]*\) -->' "$file" 2>/dev/null | grep -v 'nexus:end' | sed 's/<!-- nexus:\(.*\) -->/\1/'
 }
 
 # Extracts content between <!-- nexus:name --> and <!-- nexus:end -->
@@ -196,11 +196,23 @@ replace_section() {
   local name="$2"
   local new_content="$3"
 
-  awk -v name="$name" -v content="$new_content" '
-    $0 ~ "<!-- nexus:" name " -->" { print; printf "%s\n", content; skip=1; next }
+  # Write content to temp file to avoid awk -v multiline/escape issues
+  local tmpfile
+  tmpfile=$(mktemp)
+  printf '%s\n' "$new_content" > "$tmpfile"
+
+  awk -v name="$name" -v tmpfile="$tmpfile" '
+    $0 ~ "<!-- nexus:" name " -->" {
+      print
+      while ((getline line < tmpfile) > 0) print line
+      close(tmpfile)
+      skip=1
+      next
+    }
     /<!-- nexus:end -->/ { if(skip) { print; skip=0; next } }
     !skip { print }
   ' "$file" > "$file.tmp"
+  rm -f "$tmpfile"
   mv "$file.tmp" "$file"
 }
 
