@@ -27,10 +27,9 @@ FAILED=()
 step() {
   CURRENT_STEP=$((CURRENT_STEP + 1))
   echo ""
-  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-  echo -e "${BOLD}[$CURRENT_STEP/$TOTAL_STEPS] $1${NC}"
-  echo -e "${DIM}$2${NC}"
-  echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "  ${BOLD}[$CURRENT_STEP/$TOTAL_STEPS] $1${NC}"
+  echo -e "  ${DIM}$2${NC}"
+  echo ""
 }
 
 installed() {
