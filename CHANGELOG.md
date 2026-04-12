@@ -4,6 +4,50 @@
 
 ---
 
+## 2026-04-11 — Weekly Audit #1
+**Agent:** Claude Code (Opus 4.6, 1M context)
+**Trigger:** Manual — `VAULT_UPDATE_PROMPT.md` weekly audit
+
+### Tools MOC & Beyond the Basics
+- Updated Stack Directory: Next.js 16, Zod 4, Tailwind v4, Ghostty 1.3
+- Updated Beyond the Basics browser section: Dia acquired by Atlassian ($610M), Zen Browser still active beta
+- Updated Claude Code section: 1M context GA, Computer Use, /loop, Auto Mode, Agent Teams, Remote Control, Voice
+- Updated Amp Code: killed editor extension, enterprise-only, pivoting to CLI/deep mode
+- Added new entrants: **Windsurf** (acquired by Cognition), **Devin** ($20/mo Core plan), **Google Antigravity** (agent-first IDE)
+- Updated multi-agent strategies: Agent Teams replaces experimental Swarms, /loop for scheduled tasks
+
+### Version and Runtime Management
+- Node.js 24 LTS now active alongside Node 22; release schedule changing Oct 2026 (every release becomes LTS)
+- Bun updated to v1.3.x, production-grade stability confirmed, 2.0 expected late 2026
+- mise at v2026.4.8, uv actively updated
+
+### AI Coding Tool Notes
+- **Claude Code**: Added 1M context window, Computer Use, /loop, Auto Mode, Agent Teams, Remote Control, PermissionDenied hook
+- **Cursor**: Rewritten for Cursor 3.0 — Background/Cloud Agents, Composer 2.0, BugBot, Design Mode, JetBrains, credit-based pricing
+- **GitHub Copilot**: Agent mode GA, coding agent (issue→PR), .agent.md, agentic code review, multi-model, mobile support
+- **Tool Comparison Matrix**: Updated all columns for April 2026 features, added "What to Watch" for Antigravity, Windsurf+Devin, Codex CLI
+
+### Foundations Notes
+- Harness Engineering: Added Anthropic three-agent harness, Codex 1M LOC application, 60% AI-assisted dev stat, MIT breakthrough tech
+- Database Decision Tree: Clarified PlanetScale is NOT shut down (Hobby tier deprecated, paid tiers operational)
+- API Design Patterns: Added note on tRPC v11 stable and Zod 4 stable
+- Developer Machine: Updated Ghostty to v1.3 with scrollback search, scrollbars, Unicode 17
+
+### Signals
+- 17 new signal entries added to Signal Log (3 red, 11 yellow, 3 green)
+- Key meta shifts: 1M context GA, autonomous agent convergence, Anthropic three-agent harness
+
+### Files Modified
+`🗺️ Tools MOC.md`, `Beyond the Basics.md`, `Version and Runtime Management.md`, `Claude Code.md`, `Cursor.md`, `GitHub Copilot.md`, `Tool Comparison Matrix.md`, `Harness Engineering Overview.md`, `Database Decision Tree.md`, `API Design Patterns.md`, `The Developer Machine.md`, `🗺️ Signals MOC.md`, `CHANGELOG.md`
+
+### Flagged for Human Review
+- <!-- REVIEW: Cursor's credit-based pricing details — verify exact credit costs per model from your own usage -->
+- <!-- REVIEW: Google Antigravity — worth adding a full note for it in AI-Coding-Tools? Only if you plan to try it -->
+- <!-- REVIEW: Superpowers (GSD) note is still mostly empty — fill in when you have hands-on experience -->
+- <!-- REVIEW: tRPC v11 and Zod 4 code examples in templates may need syntax updates for new APIs -->
+
+---
+
 ## 2026-04-11 — Initial Build
 **Agent:** Claude (claude.ai conversation)
 **Trigger:** Manual build

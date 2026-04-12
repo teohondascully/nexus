@@ -10,7 +10,7 @@
 Start here: Is your data relational? (users have orgs, orgs have resources, etc.)
 ├── Yes (95% of apps) → Postgres
 │   ├── Need serverless/branching? → Neon or Supabase
-│   ├── Need MySQL compat? → PlanetScale
+│   ├── Need MySQL compat? → PlanetScale (still active — Hobby tier deprecated, paid tiers operational)
 │   └── Self-hosting? → Plain Postgres on Fly.io/Railway
 ├── Mostly documents/flexible schema? → MongoDB (but probably still Postgres with JSONB)
 └── Real-time sync to client? → Supabase (Postgres + realtime) or Firebase

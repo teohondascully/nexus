@@ -1,21 +1,21 @@
 # Tool Comparison Matrix
 
-> When to use which AI coding tool. Updated April 2026.
+> When to use which AI coding tool. Last audited: 2026-04-11.
 
 ---
 
 ## Quick Comparison
 
-| Feature | Claude Code | Cursor | GitHub Copilot | Superpowers/GSD |
+| Feature | Claude Code | Cursor 3.0 | GitHub Copilot | Superpowers/GSD |
 |---------|------------|--------|----------------|-----------------|
 | **Interface** | CLI (terminal) | IDE (VS Code fork) | IDE plugin | CLI (wraps Claude Code) |
-| **Rules file** | CLAUDE.md | .cursor/rules/ | AGENTS.md | CLAUDE.md |
-| **Hooks/verification** | Yes (lifecycle hooks) | Limited | Limited | Yes (inherits Claude Code) |
-| **MCP support** | Yes | Yes | Partial | Yes |
-| **Multi-file editing** | Yes (via tools) | Yes (native) | Yes | Yes |
-| **Context window** | Large (200k) | Varies by model | Varies | Large (inherits Claude) |
-| **Best for** | Agentic workflows, automation, CI | Interactive editing, visual diffs | Quick completions, inline | Enhanced agentic workflows |
-| **Harness ceiling** | Level 4 | Level 2-3 | Level 2 | Level 4 |
+| **Rules file** | CLAUDE.md | .cursor/rules/ | AGENTS.md + .agent.md | CLAUDE.md |
+| **Hooks/verification** | Yes (lifecycle hooks, Auto Mode) | BugBot code review | Agentic code review | Yes (inherits Claude Code) |
+| **MCP support** | Yes (500K result storage) | Yes (plugin marketplace) | Partial | Yes |
+| **Autonomous agents** | /loop, Agent Teams, sub-agents | Background/Cloud Agents | Coding Agent (issue→PR) | Yes (inherits Claude Code) |
+| **Context window** | 1M tokens (Opus/Sonnet 4.6) | Varies by model | Varies | 1M (inherits Claude) |
+| **Best for** | Agentic workflows, automation, CI | Interactive editing, parallel agents, visual diffs | Issue→PR automation, inline completions | Enhanced agentic workflows |
+| **Harness ceiling** | Level 4 | Level 2-3 | Level 2-3 | Level 4 |
 
 ## When to Use What
 
@@ -26,36 +26,40 @@
 - Need hooks to enforce quality automatically
 - Working from terminal, not an IDE
 - Tasks that benefit from agent autonomy (scaffolding, refactoring)
+- Fully autonomous background work (/loop, scheduled tasks)
+- Large codebases that benefit from 1M context
 
 **Skip when:**
 - Quick inline edits to a specific function
 - Visual review of changes across many files simultaneously
 - You want inline autocomplete while typing
 
-### Cursor
+### Cursor 3.0
 **Use when:**
 - Editing specific files with visual context
 - Need to see diffs across files side-by-side
-- Interactive back-and-forth on a focused area
+- Running parallel agents across multiple workspaces
+- Want Design Mode for precise UI feedback
 - Want inline completions while writing
 - Pair-programming style workflow
 
 **Skip when:**
-- Large autonomous tasks (agent loop is less mature than Claude Code)
-- Need lifecycle hooks for verification
+- Need mature lifecycle hooks for verification
 - CI/CD integration
+- Want predictable pricing (credit-based billing can surprise you)
 
 ### GitHub Copilot
 **Use when:**
-- Already in VS Code and want inline suggestions
+- Already in VS Code/JetBrains and want inline suggestions
+- Want issue-to-PR automation via coding agent
 - Quick completions for boilerplate code
-- Tab-completion style workflow
 - Team already standardized on it
+- Need multi-model access (Claude, Gemini, OpenAI) in one tool
 
 **Skip when:**
-- Autonomous multi-file generation
-- Complex agent workflows
 - Need strong verification/hooks
+- Complex multi-agent orchestration
+- Need 1M context window
 
 ## Combining Tools
 
@@ -70,10 +74,11 @@ The key is matching the tool to the task, not picking one for everything.
 ## What to Watch For
 
 The AI coding tool space moves fast. Things that could shift this matrix:
-- Cursor adding better hook/verification systems
-- Claude Code getting a visual IDE interface
-- New entrants (Windsurf, Augment, Devin, etc.)
-- Model improvements that make tool choice less important
+- **Google Antigravity** — agent-first IDE with Manager view for parallel agents. 6% adoption in 2 months. Still maturing but architecturally interesting.
+- **Windsurf + Devin merger** — Cognition acquired Windsurf, plans to merge Devin's agent capabilities into the IDE. Could create a strong IDE+agent combo.
+- **OpenAI Codex CLI** — free, open-source, supports Anthropic too. GPT-5.4 integration. Worth watching.
+- **Cursor's credit model** — if pricing stabilizes, Cursor 3.0's agent features rival Claude Code for IDE-first workflows.
+- Model improvements continuing to narrow the gap between tools.
 
 Track shifts in [[🗺️ Signals MOC]].
 

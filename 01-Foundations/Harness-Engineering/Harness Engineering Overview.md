@@ -48,7 +48,15 @@ OpenAI's Codex team used a directional dependency chain:
 ```
 Types → Config → Repo → Service → Runtime → UI
 ```
-Enforced by custom linters + structural tests + CI gates. Not by documentation.
+Enforced by custom linters + structural tests + CI gates. Not by documentation. The Codex team built a production application with **1M+ lines of code where no lines were written by human hands**, averaging 3.5 merged PRs per engineer per day — with throughput *increasing* as the team grew because better harness design compounded the value of each additional engineer.
+
+### Anthropic's Three-Agent Harness (April 2026)
+Anthropic published a three-agent harness architecture separating concerns:
+1. **Planning agent** — breaks work into steps and maintains coherence
+2. **Generation agent** — writes code and implements changes
+3. **Evaluation agent** — reviews output and verifies correctness
+
+This division improves quality over multi-hour AI sessions by preventing the single-agent drift problem.
 
 ### Verification Hierarchy
 Agents take the path of least resistance. The verification standard you set is the one you get:
@@ -66,6 +74,9 @@ For long-running tasks that exceed context windows:
 
 ### Git as Undo
 Agents commit when a step succeeds, not when a feature is complete. The harness uses git as a rollback mechanism.
+
+### Industry Adoption (2026)
+According to Anthropic's Agentic Coding Trends Report, developers integrate AI into **60% of their work**. Engineering roles are shifting toward agent supervision, system design, and output review. "Harness engineering" is now a mainstream term — MIT Technology Review named generative coding a 2026 Breakthrough Technology.
 
 ---
 

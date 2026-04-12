@@ -1,16 +1,19 @@
 # Beyond the Basics — The IFYKYK Layer
 
-> Tools, strategies, and decisions that most guides skip. Researched and verified as of April 2026.
+> Tools, strategies, and decisions that most guides skip. Last audited: 2026-04-11.
 
 ---
 
 ## Browser
 
-### Arc is Dead
-Arc browser was officially discontinued in May 2025. The Browser Company stopped all development and pivoted to building **Dia**, an AI-first browser. If you're already using Arc, it still works but receives no updates and will fall behind.
+### Arc is Dead — Dia is Atlassian's Now
+Arc browser was discontinued in May 2025. The Browser Company pivoted to **Dia**, an AI-first browser. In October 2025, **Atlassian acquired The Browser Company for $610M**. Dia is now broadly available on macOS with a free tier and Dia Pro at $20/mo. It integrates with Slack, Notion, Google Calendar, Gmail, and other services via its AI assistant.
+
+If you're already using Arc, it still works but receives no updates and will fall behind.
 
 **What to use instead:**
-- **Zen Browser** — open-source, Firefox-based, closest to Arc's interface. 40k+ GitHub stars. The community pick for Arc refugees.
+- **Zen Browser** — open-source, Firefox-based, closest to Arc's interface. Still in active beta (v1.19.8b as of April 2026), praised for fast iteration and responsive team. The community pick for Arc refugees.
+- **Dia** — if you want AI-first browsing and don't mind paying $20/mo for Pro. Good Atlassian ecosystem integration.
 - **Brave** — privacy-focused, Chromium-based, actively developed. Good if you don't need Arc's Spaces.
 - **Chrome** — boring but universal. Extension ecosystem is unmatched. Sometimes boring is the right answer.
 
@@ -33,23 +36,33 @@ One developer tracked 10 billion tokens over 8 months — API cost would have be
 **Model choice in Claude Code:**
 - **Sonnet 4.6** — handles 80% of coding tasks. Fast, cheap.
 - **Opus 4.6** — for complex multi-file refactors, architecture decisions, tricky debugging. Use selectively.
+- Both models now support **1M token context window** (GA, no surcharge). Max/Team/Enterprise get 1M by default on Opus.
 - Use Sonnet by default, switch to Opus when you need deeper reasoning.
 
+**Major new features (March-April 2026):**
+- **Computer Use** — Claude can point, click, and navigate your screen (Pro and Max)
+- **Scheduled Tasks (/loop)** — run recurring jobs on Anthropic cloud, even when laptop is off
+- **Remote Control** — send instructions from your phone via Claude App
+- **Auto Mode** — smart auto-approval for safe actions, blocks risky ones
+- **Agent Teams** — multi-threaded orchestrated work across sub-agents
+- **Voice** — push-to-talk via spacebar, 20 languages
+
 ### Amp Code (Sourcegraph)
-**What it is:** A Claude Code competitor with better sub-agent orchestration out of the box. Built on Sourcegraph's code search engine — strong at understanding large, complex codebases.
+**What it is:** Rebranded from Cody to Amp. CLI and VS Code-based AI coding agent built on Sourcegraph's code search engine.
+
+**Status (April 2026):** Amp discontinued its VS Code editor extension in February 2026 to focus on CLI and deep mode. Public free/Pro self-serve plans were also discontinued — now enterprise-oriented (contact sales). They stated they "need to grow more slowly so they can sprint on the frontier."
 
 **Advantages over Claude Code:**
-- Sub-agents work without manual configuration
-- Deep Mode for extended autonomous sessions
-- Persistent threads that track naming conventions, test structures, API patterns across sessions
-- Built-in code review agent, diagram generator
+- Deep Mode with oracle capabilities for extended autonomous sessions
+- GPT-5.4 integration alongside Claude models
+- Strong at understanding large, complex codebases via Sourcegraph's search
 
 **Disadvantages:**
-- More expensive (pay-per-token, no flat rate equivalent to Max)
+- No longer has a self-serve plan — enterprise sales only
+- Killed the editor extension, limiting accessibility
 - Smaller ecosystem — Claude Code has more community tooling, skills, hooks
-- Debugging experience is less documented
 
-**When to consider:** If you're working on a very large codebase where code search and context are the bottleneck. For solo greenfield projects, Claude Code is more cost-effective.
+**When to consider:** Enterprise teams with very large codebases where Sourcegraph's code intelligence is already in use. Less relevant for solo founders now.
 
 ### Aider
 **What it is:** Open-source, terminal-first AI coding tool. BYOM (bring your own model) — works with Claude, GPT, local models.
@@ -63,14 +76,45 @@ One developer tracked 10 billion tokens over 8 months — API cost would have be
 **When to consider:** When you want to use local models, when cost is a major constraint, or when you want full control over which model handles which task.
 
 ### Cline
-**What it is:** Open-source VS Code agent. BYOM. Always asks for confirmation before risky actions.
+**What it is:** Open-source VS Code agent (formerly Claude Dev). BYOM. 5M+ installs. Now also on JetBrains, Zed, Neovim, and CLI.
 
 **Advantages:**
-- Transparency — you see exactly what it's about to do
+- Transparency — Plan mode (analyze) and Act mode (execute with approval at each step)
 - Visual diffs in the editor
-- MCP support
+- MCP support, browser automation
+- Free (you pay only API costs, typically $3-15/mo)
 
 **When to consider:** If you want agent capabilities inside VS Code without paying for Cursor, and you value explicit control over actions.
+
+### Windsurf (Cognition/ex-Codeium)
+**What it is:** Agentic AI code editor. Acquired by Cognition AI (Devin's maker) for ~$250M in December 2025 after a complex saga involving failed OpenAI and Google bids. $82M ARR at acquisition.
+
+**Key features:**
+- SWE-1.5 proprietary model (13x faster than Sonnet 4.5, approaching Claude-level performance)
+- Arena Mode — compare models side-by-side in the IDE
+- Parallel agents, browser integration, voice commands
+- $20/mo (quota-based billing since March 2026)
+
+**When to consider:** If you want an IDE-first experience similar to Cursor with strong autonomous agent features. Watch for Devin integration.
+
+### Devin (Cognition)
+**What it is:** Autonomous AI coding agent. Slashed pricing from $500-only to **$20/mo Core plan** in January 2026.
+
+**Pricing:**
+- Core: $20/mo + $2.25/ACU (1 ACU ≈ 15 min of active work)
+- Team: $500/mo with 250 ACUs included ($2.00/ACU after)
+
+**When to consider:** For tasks you want to fully delegate — Devin works asynchronously, turns issues into PRs. Good for maintenance tasks, bug fixes, and well-defined features. Now actually affordable for solo founders at $20/mo entry.
+
+### Google Antigravity (NEW)
+**What it is:** Google's agent-first IDE, announced November 2025 alongside Gemini 3. A heavily modified VS Code fork with a unique "Manager view" for orchestrating parallel agents.
+
+**Key features:**
+- Editor view (standard IDE + agent sidebar) and Manager view (multi-agent control center)
+- Multi-model support (Gemini 3.1 Pro, Claude Opus/Sonnet 4.6, GPT-OSS-120B)
+- 6% developer adoption within 2 months of launch — fast-growing
+
+**When to consider:** Worth watching but not yet reliable enough to be your only tool. The Manager view for parallel agent orchestration is the most interesting differentiator.
 
 ---
 
@@ -99,9 +143,11 @@ Do NOT make changes. Only report issues."
 
 ### Claude Code's Built-In Multi-Agent Features
 
-**Subagents:** Claude Code can spawn specialized sub-agents with separate context windows. The main agent delegates focused tasks (research, testing, review) and gets results back.
+**Subagents:** Claude Code can spawn specialized sub-agents with separate context windows. The main agent delegates focused tasks (research, testing, review) and gets results back. Named subagents now appear in @ mention typeahead.
 
-**Swarms (experimental):** A hidden feature discovered in early 2026 — a team lead agent delegates to specialist agents (frontend, backend, testing, docs) with a shared task board. Still maturing.
+**Agent Teams:** Shipped in February 2026 — multi-threaded orchestrated work across sub-agents. More mature than the earlier experimental swarms. Code Kit v5.0 supports this.
+
+**Scheduled Tasks (/loop):** Claude Code can now run recurring jobs on Anthropic cloud infrastructure even when your computer is off. Attach repos, set a schedule, add connectors — fully autonomous background work.
 
 **Code Review (Teams/Enterprise):** Anthropic's built-in multi-agent code review. Runs automatically on PRs, dispatches parallel review agents.
 

@@ -1,6 +1,6 @@
 # Version and Runtime Management
 
-> One tool per concern. No more nvm + pyenv + rbenv. No more pip. No more npm.
+> One tool per concern. No more nvm + pyenv + rbenv. No more pip. No more npm. Last audited: 2026-04-11.
 
 ---
 
@@ -10,7 +10,7 @@
 |---------|---------|------------|---------|
 | Runtime versions (Node, Python, Go) | nvm + pyenv + rbenv | **mise** | One tool for everything, 10x faster |
 | JavaScript packages | npm / yarn | **pnpm** | 3x faster, strict, disk-efficient |
-| JavaScript runtime | Node.js | **Bun** (new projects) / Node.js (existing) | 3x HTTP throughput, native TypeScript |
+| JavaScript runtime | Node.js | **Bun 1.3** (new projects) / Node.js (existing) | 3x HTTP throughput, native TypeScript |
 | Python packages | pip + venv | **uv** | 10-100x faster, replaces pip + venv + pyenv |
 | Python linting | pylint / flake8 | **Ruff** | 100x faster (same team as uv) |
 
@@ -31,21 +31,24 @@ echo 'eval "$(mise activate zsh)"' >> ~/.zshrc
 ### Usage
 ```bash
 # Install and set versions per-project
-mise use node@22       # Node.js 22 for this directory
+mise use node@22       # Node.js 22 LTS for this directory
+mise use node@24       # Node.js 24 LTS (latest) for this directory
 mise use python@3.12   # Python 3.12 for this directory
 mise use go@1.22       # Go 1.22 for this directory
 
 # Global defaults
-mise use --global node@22
+mise use --global node@24
 
 # Project config (.mise.toml at project root)
 cat .mise.toml
 ```
 
+> **Note (April 2026):** Node 22 and Node 24 are both active LTS. Starting October 2026, Node.js is changing its release schedule — one major release per year (April), every release becomes LTS. No more even/odd distinction.
+
 ### Project Config (`.mise.toml`)
 ```toml
 [tools]
-node = "22"
+node = "24"
 python = "3.12"
 
 [env]
@@ -107,7 +110,7 @@ uv tool install ruff
 
 Replaces: Node.js (for new projects), ts-node, tsx
 
-3x faster HTTP throughput, 4-10x faster startup, native TypeScript execution, built-in test runner and bundler.
+3x faster HTTP throughput, 4-10x faster startup, native TypeScript execution, built-in test runner and bundler. Current version: **1.3.x** (production-grade stability confirmed, 2.0 expected late 2026).
 
 ### When to Use Bun vs Node.js
 
@@ -180,7 +183,7 @@ brew install mise
 echo 'eval "$(mise activate zsh)"' >> ~/.zshrc
 
 # Node.js + pnpm via mise
-mise use --global node@22
+mise use --global node@24
 npm install -g pnpm
 
 # Bun

@@ -5,15 +5,16 @@
 ---
 
 ## AI Coding Tools
-- [[Claude Code]] — CLI agent, hooks system, CLAUDE.md, MCP integration
+- [[Claude Code]] — CLI agent, 1M context, hooks, CLAUDE.md, MCP, /loop, Computer Use
 - [[Superpowers (GSD)]] — Claude Code wrapper with enhanced workflows
-- [[Cursor]] — IDE with .cursor/rules/, multi-file editing
-- [[GitHub Copilot]] — AGENTS.md, inline completions
+- [[Cursor]] — IDE with Cursor 3.0 agents, .cursor/rules/, Design Mode
+- [[GitHub Copilot]] — AGENTS.md, agent mode GA, coding agent, .agent.md
 - [[Tool Comparison Matrix]] — when to use which
 
 ## Current Meta (April 2026)
 - [[Beyond the Basics]] — IFYKYK tools, browser choice, Claude plans, multi-agent strategies, niche picks
 - **Harness > Model** — stop upgrading models, start building constraints ([[Harness Engineering Overview]])
+- **Agent autonomy is real** — Claude Code /loop, Copilot coding agent, Cursor background agents all ship autonomous work
 - **Vertical slices** — smallest testable feature, not big PRs
 - **CLAUDE.md is mandatory** — project conventions in context, every session
 - **Tests in the loop** — agent runs tests after every change, not at the end
@@ -25,13 +26,13 @@
 | Category | Current Pick | Runner-Up | Foundation Layer |
 |----------|-------------|-----------|-----------------|
 | Monorepo | Turborepo + pnpm | Nx | Layer 1 |
-| Framework | Next.js (App Router) | SvelteKit | — |
+| Framework | Next.js 16 (App Router) | SvelteKit | — |
 | Database | Postgres (Neon/Supabase) | PlanetScale | Layer 2 |
 | ORM | Drizzle | Prisma | Layer 2 |
-| Validation | Zod | Valibot | Layer 4 |
+| Validation | Zod 4 | Valibot | Layer 4 |
 | Auth | Clerk | Auth.js | Layer 3 |
 | API | tRPC | Server Actions | Layer 4 |
-| Styling | Tailwind + shadcn/ui | Radix | — |
+| Styling | Tailwind v4 + shadcn/ui | Radix | — |
 | Background Jobs | Inngest | Trigger.dev | Layer 5 |
 | Payments | Stripe | — | Layer 11 |
 | Email | Resend + React Email | Postmark | Layer 12 |
@@ -50,7 +51,7 @@
 
 | Category | Pick | Replaces | Why |
 |----------|------|----------|-----|
-| Terminal | Ghostty | iTerm2 / Terminal.app | GPU-accelerated, native, fastest in benchmarks, zero config |
+| Terminal | Ghostty 1.3 | iTerm2 / Terminal.app | GPU-accelerated, native, fastest in benchmarks, scrollback search, zero config |
 | Prompt | Starship | Oh-My-Zsh prompt | Rust, fast, shows only what matters |
 | Version mgr | mise | nvm + pyenv + rbenv + asdf | One tool, Rust, manages env vars + tasks too |
 | JS packages | pnpm | npm / yarn | 3x faster, strict deps, best monorepo support |

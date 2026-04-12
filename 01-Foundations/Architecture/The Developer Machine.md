@@ -26,9 +26,11 @@ Each layer wraps the previous one. Optimize from the bottom up.
 
 ## Terminal Emulator
 
-### The Pick: Ghostty
+### The Pick: Ghostty (v1.3, March 2026)
 - GPU-accelerated, written in Zig by Mitchell Hashimoto (HashiCorp founder)
 - Native macOS feel (Metal rendering, AppKit, Mission Control integration)
+- **v1.3 added:** scrollback search (cmd+f), native scrollbars, click-to-move-cursor, Unicode 17 support
+- Performance: rearchitected renderer, 2-5x lower lock time, available in Ubuntu 26.04 repos
 - Zero-config — works perfectly out of the box
 - Free, open-source, non-profit stewarded
 - Fastest terminal in benchmarks (lower latency than Warp, iTerm2, Alacritty)
