@@ -397,6 +397,68 @@ Exit 1 if any found. Skip if fewer than 10 files (project too small).
 
 ---
 
+## `nexus uninstall` — Full Undo Path
+
+The uninstall flow should make it clear that everything nexus did is reversible. Three tiers:
+
+### Tier 1: Remove nexus itself (always offered)
+
+- Delete `~/.nexus`
+- Delete `~/.local/bin/nexus` symlink
+
+### Tier 2: Remove bootstrap packages (selectable)
+
+Same as v1 — numbered list of all brew packages, pick by number or "all". Includes lefthook, gh, all CLI tools, mise, claude-code.
+
+### Tier 3: Undo config changes (new, shown as a guide)
+
+Nexus doesn't auto-undo configs (too risky — user may have customized them). Instead it prints exactly what was changed and how to undo each one:
+
+```
+  Config changes made by bootstrap:
+
+  Shell
+    ~/.zshrc — remove the block between:
+      # === Nexus Shell Config ===
+      # === End Nexus Shell Config ===
+
+  Terminal
+    ~/.config/ghostty/config — delete file or restore your backup
+    ~/.config/ghostty/themes/catppuccin-mocha — delete file
+
+  Prompt
+    ~/.config/starship.toml — delete file
+
+  Runtimes
+    ~/.config/mise/config.toml — delete file
+
+  Git
+    These settings were changed in ~/.gitconfig:
+      core.pager = delta
+      interactive.diffFilter = delta --color-only
+      delta.navigate = true
+      delta.side-by-side = true
+      init.defaultBranch = main
+      pull.rebase = true
+      push.autoSetupRemote = true
+      rerere.enabled = true
+    To reset any: git config --global --unset <key>
+
+  None of these are destructive. Your data and projects are untouched.
+```
+
+### Bootstrap welcome screen addition
+
+Add a note at the bottom of the bootstrap welcome screen (the page users see before pressing Enter):
+
+```
+  Safe to re-run. Fully reversible. Run nexus uninstall for details.
+```
+
+This addresses the "convince a skeptical dev" concern — before they even start, they know how to undo everything.
+
+---
+
 ## Out of Scope (v2)
 
 - Stack-specific scaffolding (use create-next-app, Drizzle init, etc.)
