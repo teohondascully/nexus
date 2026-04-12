@@ -34,6 +34,11 @@ echo -e "${BOLD}║         Nexus — Dev Environment          ║${NC}"
 echo -e "${BOLD}║        https://github.com/teohondascully/nexus   ║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════════╝${NC}"
 echo ""
+echo -e "This will install Nexus to ${BOLD}~/.nexus${NC} and run bootstrap."
+echo ""
+read -p "Press Enter to continue (or Ctrl-C to cancel)..." < /dev/tty
+
+echo ""
 
 # ── Preflight ────────────────────────────────────────────────────
 
