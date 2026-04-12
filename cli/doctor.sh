@@ -203,6 +203,33 @@ cmd_doctor() {
     ((failed++))
   fi
 
+  # ── 10. Nexus version (skip if --quick) ────────────────────────────
+  if $quick; then
+    print_skip "Nexus version (--quick)"
+    ((skipped++))
+  elif [ -d "$HOME/.nexus/.git" ] && [ -f "$HOME/.nexus/VERSION" ]; then
+    local local_ver
+    local_ver=$(cat "$HOME/.nexus/VERSION" 2>/dev/null || echo "unknown")
+    local remote_ver
+    remote_ver=$(git -C "$HOME/.nexus" show origin/main:VERSION 2>/dev/null || echo "")
+    if [ -z "$remote_ver" ]; then
+      # Try fetching first
+      git -C "$HOME/.nexus" fetch --quiet origin main 2>/dev/null || true
+      remote_ver=$(git -C "$HOME/.nexus" show origin/main:VERSION 2>/dev/null || echo "")
+    fi
+    if [ -z "$remote_ver" ] || [ "$local_ver" = "$remote_ver" ]; then
+      print_ok "Nexus version (v${local_ver})"
+      ((passed++))
+    else
+      print_fail "Nexus outdated (v${local_ver} → v${remote_ver})"
+      echo -e "        ${DIM}Run: curl -fsSL https://www.teonnaise.com/install | bash${NC}"
+      ((failed++))
+    fi
+  else
+    print_skip "Nexus version (~/.nexus not found)"
+    ((skipped++))
+  fi
+
   # ── Summary ───────────────────────────────────────────────────────
   local total=$(( passed + failed ))
   echo ""

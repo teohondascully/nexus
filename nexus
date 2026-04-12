@@ -31,6 +31,10 @@ cmd_help() {
   echo -e "    ${GREEN}doctor${NC} --fix      Auto-fix what it can"
   echo -e "    ${GREEN}update${NC}            Sync project against latest vault templates"
   echo ""
+  echo -e "  ${BOLD}Other${NC}"
+  echo -e "    ${GREEN}version${NC}           Show installed version"
+  echo -e "    ${GREEN}uninstall${NC}         Remove nexus (with optional package cleanup)"
+  echo ""
 }
 
 # ── Dispatch ─────────────────────────────────────────────────────
@@ -48,6 +52,8 @@ case "${1:-}" in
               esac ;;
   doctor)     shift; source "$NEXUS_DIR/cli/doctor.sh"; cmd_doctor "$@" ;;
   update)     source "$NEXUS_DIR/cli/update.sh"; cmd_update ;;
+  version)    echo "nexus v$(cat "$NEXUS_DIR/VERSION" 2>/dev/null || echo "unknown")" ;;
+  uninstall)  exec bash "$NEXUS_DIR/install.sh" --uninstall ;;
   help|--help|-h) cmd_help ;;
   "")         cmd_help ;;
   *)          echo -e "${RED}Unknown command: $1${NC}"; cmd_help ;;
