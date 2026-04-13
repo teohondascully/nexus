@@ -189,4 +189,7 @@ json.dump(data, sys.stdout, indent=2)
     echo -e "    ${DIM}git push -u origin main${NC}"
     echo ""
   fi
+
+  echo -e "  ${BOLD}Now just code.${NC} Nexus handles the rest."
+  echo ""
 }
