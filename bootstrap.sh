@@ -237,8 +237,8 @@ brew_install "zsh-syntax-highlighting" "colors commands green/red as you type"
 if [ ! -f ~/.config/ghostty/config ]; then
   echo "  Writing Ghostty config + Catppuccin theme..."
   mkdir -p ~/.config/ghostty/themes
-  curl -so ~/.config/ghostty/themes/catppuccin-mocha \
-    https://raw.githubusercontent.com/catppuccin/ghostty/main/themes/catppuccin-mocha
+  curl -sfo ~/.config/ghostty/themes/catppuccin-mocha \
+    https://raw.githubusercontent.com/catppuccin/ghostty/main/themes/catppuccin-mocha.conf
   cat > ~/.config/ghostty/config << 'GHOSTTY'
 font-family = JetBrains Mono
 font-size = 14
